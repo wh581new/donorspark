@@ -118,8 +118,9 @@ export default function Home() {
 
       const orgSlug = data.org.slug
       const token = data.org.accessToken
-      const donorLink = `https://whatcouldioffer.com/org/${orgSlug}`
-      const adminLink = `https://whatcouldioffer.com/admin/${token}`
+      const origin = typeof window !== 'undefined' ? window.location.origin : ''
+      const donorLink = `${origin}/org/${orgSlug}`
+      const adminLink = `${origin}/admin/${token}`
 
       setSuccess({ slug: orgSlug, donorLink, adminLink, accessToken: token })
     } catch (err) {
@@ -129,10 +130,24 @@ export default function Home() {
     }
   }
 
-  const copyToClipboard = (text: string, field: string) => {
-    navigator.clipboard.writeText(text)
-    setCopiedField(field)
-    setTimeout(() => setCopiedField(null), 2000)
+  const copyToClipboard = async (text: string, field: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedField(field)
+      setTimeout(() => setCopiedField(null), 2000)
+    } catch {
+      // Fallback for non-HTTPS or denied permissions
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      setCopiedField(field)
+      setTimeout(() => setCopiedField(null), 2000)
+    }
   }
 
   const scrollToForm = () => {
@@ -349,7 +364,7 @@ export default function Home() {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
               <a
-                href="https://whatcouldioffer.com/org/demo"
+                href="/org/demo"
                 className="inline-flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 font-medium py-3.5 px-7 rounded-full border border-gray-200 hover:border-gray-300 transition-all text-[15px] bg-white"
               >
                 See a live demo
@@ -695,7 +710,7 @@ export default function Home() {
               rel="noopener noreferrer"
               className="group"
             >
-              <div className="transition-all duration-500 group-hover:animate-gradient" style={{ filter: 'grayscale(0)' }}>
+              <div className="transition-all duration-500 group-hover:hue-rotate-[45deg]">
                 <BetterWorldLogo className="h-5 w-auto transition-all duration-500 group-hover:scale-110" color="#6b7280" />
               </div>
             </a>

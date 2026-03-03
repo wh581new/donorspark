@@ -182,8 +182,12 @@ function SuggestionCard({
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const copyCatalog = () => {
-    navigator.clipboard.writeText(`${item.title}\n\n${item.catalogDescription}`);
+  const copyCatalog = async () => {
+    try {
+      await navigator.clipboard.writeText(`${item.title}\n\n${item.catalogDescription}`);
+    } catch {
+      // fallback
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -397,12 +401,14 @@ function ShareModal({
   selectedItems,
   donorSummary,
   orgName,
+  orgSlug,
   brandColor,
   onClose,
 }: {
   selectedItems: AuctionSuggestion[];
   donorSummary: string;
   orgName: string;
+  orgSlug: string;
   brandColor: string;
   onClose: () => void;
 }) {
@@ -430,6 +436,7 @@ function ShareModal({
           donorName: name,
           donorEmail: email,
           orgName,
+          orgSlug,
           orgEmail: '', // resolved server-side
           donorSummary,
           selectedOfferings: selectedItems,
@@ -770,8 +777,6 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
       </div>
     );
   }
-
-  const currentStep = step === 'select' ? 0 : step === 'input' ? 0 : step === 'results' ? 2 : 0;
 
   return (
     <div className="min-h-screen bg-white">
@@ -1220,6 +1225,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                     selectedItems={selectedItems}
                     donorSummary={donorSummary}
                     orgName={org.name}
+                    orgSlug={org.slug}
                     brandColor={brandColor}
                     onClose={() => setShowShareModal(false)}
                   />

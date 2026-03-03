@@ -50,6 +50,7 @@ export interface SharePayload {
   donorEmail: string;
   orgEmail?: string;
   orgName: string;
+  orgSlug?: string;
   selectedOfferings: AuctionSuggestion[];
   donorSummary: string;
 }

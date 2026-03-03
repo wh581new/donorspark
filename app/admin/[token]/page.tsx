@@ -30,9 +30,12 @@ import { useParams } from 'next/navigation';
 interface Offering {
   title: string;
   description: string;
-  value: string;
+  estimatedValue: string;
   category: string;
-  catalogCopy: string;
+  catalogDescription: string;
+  // Legacy field aliases for backward compatibility
+  value?: string;
+  catalogCopy?: string;
 }
 
 interface Submission {
@@ -232,8 +235,12 @@ function SubmissionCard({
     }
   };
 
-  const copyText = (text: string, idx: number) => {
-    navigator.clipboard.writeText(text);
+  const copyText = async (text: string, idx: number) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // fallback
+    }
     setCopiedIdx(idx);
     setTimeout(() => setCopiedIdx(null), 2000);
   };
@@ -243,7 +250,8 @@ function SubmissionCard({
   });
 
   const totalValue = submission.offerings.reduce((sum, o) => {
-    const val = parseInt(o.value.replace(/[^0-9]/g, ''), 10);
+    const valStr = o.estimatedValue || o.value || '0';
+    const val = parseInt(valStr.replace(/[^0-9]/g, ''), 10);
     return sum + (isNaN(val) ? 0 : val);
   }, 0);
 
@@ -347,17 +355,17 @@ function SubmissionCard({
                           <span className="text-[11px] text-gray-400 uppercase tracking-wide">{offering.category}</span>
                         </div>
                         <span className="text-sm font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg flex-shrink-0">
-                          {offering.value}
+                          {offering.estimatedValue || offering.value || 'N/A'}
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 leading-relaxed">{offering.description}</p>
-                      {offering.catalogCopy && (
+                      {(offering.catalogDescription || offering.catalogCopy) && (
                         <div className="mt-3 pt-3 border-t border-gray-100 flex items-start gap-2">
                           <p className="flex-1 text-sm text-gray-500 italic leading-relaxed">
-                            &ldquo;{offering.catalogCopy}&rdquo;
+                            &ldquo;{offering.catalogDescription || offering.catalogCopy}&rdquo;
                           </p>
                           <button
-                            onClick={(e) => { e.stopPropagation(); copyText(`${offering.title}\n\n${offering.catalogCopy}`, idx); }}
+                            onClick={(e) => { e.stopPropagation(); copyText(`${offering.title}\n\n${offering.catalogDescription || offering.catalogCopy}`, idx); }}
                             className="flex-shrink-0 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                           >
                             {copiedIdx === idx ? (
@@ -411,7 +419,7 @@ function EmptyState() {
     '🎯 Still waiting for donors...',
     '☕ Maybe grab a coffee while you wait?',
     '🚀 Great things take time!',
-    '🦄 You found the secret! You&apos;re a dashboard power user!',
+    "🦄 You found the secret! You're a dashboard power user!",
   ];
 
   const handleClick = () => {
@@ -470,7 +478,11 @@ function ShareLink({ slug }: { slug: string }) {
   const url = `${typeof window !== 'undefined' ? window.location.origin : ''}/org/${slug}`;
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(url);
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // fallback
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

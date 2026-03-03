@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SharePayload } from '@/lib/types';
+import { getOrgBySlug, createSubmission } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,16 +43,43 @@ ${offeringsList}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Powered by What Could I Offer? — by BetterWorld
-https://whatcouldioffer.com
 `.trim();
 
     // For hackathon: log the email and return success
     // In production: integrate with SendGrid, Resend, or similar
     console.log('=== SHARE EMAIL ===');
-    console.log(`To: ${body.orgEmail}`);
+    console.log(`To: ${body.orgEmail || body.orgName}`);
     console.log(`Subject: ${body.donorName} wants to offer ${body.selectedOfferings.length} item${body.selectedOfferings.length > 1 ? 's' : ''} for your auction!`);
     console.log(emailBody);
     console.log('=== END EMAIL ===');
+
+    // Also save to the database so it appears in admin dashboard
+    if (body.orgSlug) {
+      try {
+        const org = await getOrgBySlug(body.orgSlug);
+        if (org) {
+          await createSubmission({
+            orgId: org.id,
+            donorName: body.donorName,
+            donorEmail: body.donorEmail,
+            donorSummary: body.donorSummary,
+            offerings: body.selectedOfferings.map(item => ({
+              title: item.title,
+              description: item.description,
+              category: item.category,
+              estimatedValue: item.estimatedValue,
+              donorCost: item.donorCost,
+              whyItWorks: item.whyItWorks,
+              isHiddenGem: item.isHiddenGem,
+              catalogDescription: item.catalogDescription,
+            })),
+          });
+        }
+      } catch (dbErr) {
+        console.error('Failed to save submission to DB (non-blocking):', dbErr);
+        // Don't fail the share if DB save fails
+      }
+    }
 
     // Return the formatted content so the UI can show a preview
     return NextResponse.json({
