@@ -155,11 +155,11 @@ function LoadingSkeleton() {
         <div className="flex items-center justify-center gap-3 mb-3">
           <Loader2 className="w-6 h-6 text-brand-500 animate-spin" />
           <span className="text-lg font-medium text-navy-700">
-            Analyzing your profile and crafting suggestions...
+            Discovering what you could offer...
           </span>
         </div>
         <p className="text-sm text-navy-600">
-          Finding your hidden gems — this takes 10-20 seconds
+          Uncovering your hidden gems — this takes 10-20 seconds
         </p>
       </div>
       {[1, 2, 3].map((i) => (
@@ -278,7 +278,7 @@ export default function Home() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-navy-800 leading-tight tracking-tight">
-                DonorSpark
+                What Could I Offer?
               </h1>
               <p className="text-[11px] text-brand-600 leading-tight">
                 by BetterWorld
@@ -303,11 +303,12 @@ export default function Home() {
           <div className="animate-fade-in">
             <div className="text-center mb-10">
               <h2 className="text-3xl sm:text-4xl font-bold text-navy-800 mb-3 tracking-tight">
-                Discover what you can offer
+                You have more to offer than you think
               </h2>
               <p className="text-lg text-navy-600 max-w-xl mx-auto leading-relaxed">
-                Uncover creative, high-value auction items you never knew you
-                had. Tell us about yourself and we&apos;ll do the rest.
+                Tell us a little about yourself and we&apos;ll uncover creative,
+                high-value offerings unique to you — things you never knew
+                could raise serious money at auction.
               </p>
             </div>
 
@@ -320,10 +321,10 @@ export default function Home() {
                   <MessageSquareText className="w-6 h-6 text-brand-600" />
                 </div>
                 <h3 className="font-semibold text-navy-800 mb-1">
-                  Tell Us About You
+                  In Your Own Words
                 </h3>
                 <p className="text-sm text-navy-600">
-                  Describe yourself or your business in your own words
+                  Describe what you do, what you love, and what makes you you
                 </p>
               </button>
 
@@ -335,10 +336,10 @@ export default function Home() {
                   <ClipboardList className="w-6 h-6 text-brand-600" />
                 </div>
                 <h3 className="font-semibold text-navy-800 mb-1">
-                  Guided Questions
+                  Quick Questions
                 </h3>
                 <p className="text-sm text-navy-600">
-                  Answer a few quick questions and we&apos;ll find your gems
+                  Answer a few prompts and we&apos;ll surface your hidden offerings
                 </p>
               </button>
 
@@ -350,10 +351,10 @@ export default function Home() {
                   <Linkedin className="w-6 h-6 text-brand-600" />
                 </div>
                 <h3 className="font-semibold text-navy-800 mb-1">
-                  Paste Your Profile
+                  Use Your Profile
                 </h3>
                 <p className="text-sm text-navy-600">
-                  Share your LinkedIn bio or social profile text
+                  Paste your LinkedIn or bio and we&apos;ll do the thinking
                 </p>
               </button>
             </div>
@@ -374,12 +375,12 @@ export default function Home() {
             {method === 'freetext' && (
               <div>
                 <h2 className="text-2xl font-bold text-navy-800 mb-2">
-                  Tell us about yourself
+                  What makes you, you?
                 </h2>
                 <p className="text-navy-600 mb-6">
-                  The more detail, the better our suggestions. Mention your
-                  profession, hobbies, skills, assets, business type — anything
-                  that makes you unique.
+                  Share anything — your profession, hobbies, skills, property,
+                  business — the more we know, the more surprising your offerings
+                  will be.
                 </p>
                 <textarea
                   value={freetext}
@@ -395,10 +396,11 @@ export default function Home() {
             {method === 'guided' && (
               <div>
                 <h2 className="text-2xl font-bold text-navy-800 mb-2">
-                  A few quick questions
+                  Let&apos;s find what you could offer
                 </h2>
                 <p className="text-navy-600 mb-6">
-                  We&apos;ll use these to find creative items you can offer.
+                  A few quick details and we&apos;ll discover offerings you didn&apos;t
+                  know you had.
                 </p>
 
                 {/* Donor type toggle */}
@@ -509,12 +511,12 @@ export default function Home() {
             {method === 'social' && (
               <div>
                 <h2 className="text-2xl font-bold text-navy-800 mb-2">
-                  Paste your profile
+                  Drop in your profile
                 </h2>
                 <p className="text-navy-600 mb-6">
-                  Copy your LinkedIn &ldquo;About&rdquo; section, bio, or any
-                  social profile text. You can also paste a URL and we&apos;ll
-                  work with whatever info is there.
+                  Paste your LinkedIn &ldquo;About,&rdquo; website bio, or any
+                  profile text — we&apos;ll find the offerings hidden in your
+                  background.
                 </p>
                 <textarea
                   value={socialText}
@@ -529,7 +531,7 @@ export default function Home() {
             {/* Nonprofit context (all methods) */}
             <div className="mt-6 pt-6 border-t border-brand-100">
               <label className="block text-sm font-medium text-navy-700 mb-1.5">
-                Auction context{' '}
+                What&apos;s the event?{' '}
                 <span className="text-navy-600 font-normal">(optional)</span>
               </label>
               <input
@@ -563,7 +565,7 @@ export default function Home() {
               className="mt-6 w-full py-3.5 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
             >
               <Sparkles className="w-5 h-5" />
-              Find My Auction Items
+              Show Me What I Could Offer
               <ArrowRight className="w-5 h-5" />
             </button>
           </div>
@@ -577,7 +579,7 @@ export default function Home() {
           <div className="animate-fade-in">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-navy-800 mb-2 tracking-tight">
-                Your Auction Items
+                Here&apos;s what you could offer
               </h2>
               <p className="text-navy-600 max-w-lg mx-auto mb-4">
                 {results.donorSummary}
@@ -587,8 +589,8 @@ export default function Home() {
                   <Gem className="w-4 h-4 text-amber-600" />
                   <span className="text-sm font-medium text-amber-800">
                     {hiddenGemsCount} Hidden Gem
-                    {hiddenGemsCount > 1 ? 's' : ''} found — low cost to you,
-                    high value to bidders!
+                    {hiddenGemsCount > 1 ? 's' : ''} — costs you little,
+                    worth a lot to bidders
                   </span>
                 </div>
               )}
@@ -607,7 +609,7 @@ export default function Home() {
                   className="px-6 py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition-all flex items-center justify-center gap-2 shadow-sm"
                 >
                   <Lightbulb className="w-5 h-5" />
-                  Generate More Ideas
+                  Discover More Offerings
                 </button>
                 <button
                   onClick={startOver}

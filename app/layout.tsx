@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'DonorSpark by BetterWorld — AI Auction Item Advisor',
+  title: 'What Could I Offer? — by BetterWorld',
   description:
-    'Discover creative, high-value auction items you never knew you could offer. Powered by AI, built by BetterWorld.',
+    'You have more to give than you think. Discover creative, high-value auction offerings unique to you — in seconds.',
 };
 
 export default function RootLayout({
