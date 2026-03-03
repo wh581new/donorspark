@@ -25,6 +25,7 @@ export interface DonorInput {
   guided?: GuidedAnswers;
   socialText?: string;
   nonprofitContext?: string;
+  previousSuggestions?: string[]; // titles of already-suggested items to avoid repeats
 }
 
 export interface AuctionSuggestion {
@@ -36,9 +37,19 @@ export interface AuctionSuggestion {
   whyItWorks: string;
   isHiddenGem: boolean;
   catalogDescription: string;
+  selected?: boolean; // user has picked this one to share with org
 }
 
 export interface SuggestionsResponse {
   donorSummary: string;
   suggestions: AuctionSuggestion[];
+}
+
+export interface SharePayload {
+  donorName: string;
+  donorEmail: string;
+  orgEmail: string;
+  orgName: string;
+  selectedOfferings: AuctionSuggestion[];
+  donorSummary: string;
 }

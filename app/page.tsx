@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Sparkles,
   Lightbulb,
@@ -18,6 +18,10 @@ import {
   Copy,
   Check,
   RotateCcw,
+  Send,
+  CheckCircle2,
+  Circle,
+  X,
 } from 'lucide-react';
 import {
   DonorType,
@@ -28,13 +32,19 @@ import {
   SuggestionsResponse,
 } from '@/lib/types';
 
-/* ─── Suggestion Card ─── */
+/* ─── Suggestion Card (now with select toggle) ─── */
 function SuggestionCard({
   item,
   index,
+  selectable,
+  selected,
+  onToggle,
 }: {
   item: AuctionSuggestion;
   index: number;
+  selectable: boolean;
+  selected: boolean;
+  onToggle: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -49,7 +59,9 @@ function SuggestionCard({
 
   return (
     <div
-      className="animate-slide-up bg-white rounded-2xl border border-brand-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+      className={`animate-slide-up bg-white rounded-2xl border shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden ${
+        selected ? 'border-brand-400 ring-2 ring-brand-200' : 'border-brand-100'
+      }`}
       style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
     >
       <div className="p-6">
@@ -70,6 +82,21 @@ function SuggestionCard({
               {item.title}
             </h3>
           </div>
+          {selectable && (
+            <button
+              onClick={onToggle}
+              className={`flex-shrink-0 mt-1 transition-colors ${
+                selected ? 'text-brand-600' : 'text-gray-300 hover:text-brand-400'
+              }`}
+              title={selected ? 'Remove from share list' : 'Add to share list'}
+            >
+              {selected ? (
+                <CheckCircle2 className="w-6 h-6" />
+              ) : (
+                <Circle className="w-6 h-6" />
+              )}
+            </button>
+          )}
         </div>
 
         <p className="text-navy-600 text-sm leading-relaxed mb-4">
@@ -148,18 +175,20 @@ function SuggestionCard({
 }
 
 /* ─── Loading Skeleton ─── */
-function LoadingSkeleton() {
+function LoadingSkeleton({ isMore }: { isMore: boolean }) {
   return (
     <div className="max-w-3xl mx-auto mt-8 space-y-6 animate-fade-in">
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-3 mb-3">
           <Loader2 className="w-6 h-6 text-brand-500 animate-spin" />
           <span className="text-lg font-medium text-navy-700">
-            Discovering what you could offer...
+            {isMore ? 'Brainstorming more ideas...' : 'Discovering what you could offer...'}
           </span>
         </div>
         <p className="text-sm text-navy-600">
-          Uncovering your hidden gems — this takes 10-20 seconds
+          {isMore
+            ? 'Finding fresh offerings you haven\u2019t seen yet'
+            : 'Uncovering your hidden gems \u2014 this takes 10-20 seconds'}
         </p>
       </div>
       {[1, 2, 3].map((i) => (
@@ -178,13 +207,216 @@ function LoadingSkeleton() {
   );
 }
 
+/* ─── Share Modal ─── */
+function ShareModal({
+  selectedItems,
+  donorSummary,
+  onClose,
+}: {
+  selectedItems: AuctionSuggestion[];
+  donorSummary: string;
+  onClose: () => void;
+}) {
+  const [donorName, setDonorName] = useState('');
+  const [donorEmail, setDonorEmail] = useState('');
+  const [orgEmail, setOrgEmail] = useState('');
+  const [orgName, setOrgName] = useState('');
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleShare = async () => {
+    if (!donorName.trim() || !donorEmail.trim() || !orgEmail.trim()) {
+      setError('Please fill in your name, email, and the organization\u2019s email.');
+      return;
+    }
+    setSending(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          donorName: donorName.trim(),
+          donorEmail: donorEmail.trim(),
+          orgEmail: orgEmail.trim(),
+          orgName: orgName.trim(),
+          selectedOfferings: selectedItems,
+          donorSummary,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to share');
+      }
+
+      setSent(true);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 animate-fade-in">
+      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl">
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-navy-800">
+              {sent ? 'Shared!' : 'Share with your organization'}
+            </h3>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {sent ? (
+            <div className="text-center py-6">
+              <div className="w-16 h-16 rounded-full bg-brand-50 flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-8 h-8 text-brand-600" />
+              </div>
+              <h4 className="text-lg font-semibold text-navy-800 mb-2">
+                Your offerings have been sent!
+              </h4>
+              <p className="text-navy-600 text-sm mb-6">
+                {orgName || 'The organization'} will receive your{' '}
+                {selectedItems.length} offering
+                {selectedItems.length > 1 ? 's' : ''} and can reach out to
+                coordinate.
+              </p>
+              <button
+                onClick={onClose}
+                className="px-6 py-2.5 rounded-xl bg-brand-600 text-white font-medium hover:bg-brand-700 transition-colors"
+              >
+                Done
+              </button>
+            </div>
+          ) : (
+            <>
+              <p className="text-navy-600 text-sm mb-5">
+                We&apos;ll send{' '}
+                <span className="font-semibold">
+                  {selectedItems.length} offering
+                  {selectedItems.length > 1 ? 's' : ''}
+                </span>{' '}
+                to the organization so they can follow up with you.
+              </p>
+
+              <div className="space-y-3 mb-5">
+                <div className="bg-cream-50 rounded-xl p-3 space-y-1">
+                  {selectedItems.map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 text-sm text-navy-700"
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-brand-500 flex-shrink-0" />
+                      <span className="font-medium">{item.title}</span>
+                      {item.isHiddenGem && (
+                        <Gem className="w-3 h-3 text-amber-500 flex-shrink-0" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-navy-700 mb-1">
+                    Your name
+                  </label>
+                  <input
+                    type="text"
+                    value={donorName}
+                    onChange={(e) => setDonorName(e.target.value)}
+                    placeholder="Jane Smith"
+                    className="w-full rounded-xl border border-brand-100 p-3 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-navy-700 mb-1">
+                    Your email
+                  </label>
+                  <input
+                    type="email"
+                    value={donorEmail}
+                    onChange={(e) => setDonorEmail(e.target.value)}
+                    placeholder="jane@example.com"
+                    className="w-full rounded-xl border border-brand-100 p-3 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-navy-700 mb-1">
+                    Organization name{' '}
+                    <span className="text-navy-600 font-normal">(optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={orgName}
+                    onChange={(e) => setOrgName(e.target.value)}
+                    placeholder="e.g. Lincoln Elementary PTA"
+                    className="w-full rounded-xl border border-brand-100 p-3 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-navy-700 mb-1">
+                    Organization&apos;s email
+                  </label>
+                  <input
+                    type="email"
+                    value={orgEmail}
+                    onChange={(e) => setOrgEmail(e.target.value)}
+                    placeholder="auction@lincolnpta.org"
+                    className="w-full rounded-xl border border-brand-100 p-3 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <p className="text-sm text-red-600 mt-3">{error}</p>
+              )}
+
+              <button
+                onClick={handleShare}
+                disabled={sending}
+                className="mt-5 w-full py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+              >
+                {sending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Share My Offerings
+                  </>
+                )}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main App ─── */
 export default function Home() {
   const [step, setStep] = useState<'select' | 'input' | 'results'>('select');
   const [method, setMethod] = useState<InputMethod | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [results, setResults] = useState<SuggestionsResponse | null>(null);
+  const [allSuggestions, setAllSuggestions] = useState<AuctionSuggestion[]>([]);
+  const [donorSummary, setDonorSummary] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [showShareModal, setShowShareModal] = useState(false);
 
   // Free text
   const [freetext, setFreetext] = useState('');
@@ -201,6 +433,8 @@ export default function Home() {
   // Optional nonprofit context
   const [nonprofitContext, setNonprofitContext] = useState('');
 
+  const resultsRef = useRef<HTMLDivElement>(null);
+
   const selectMethod = (m: InputMethod) => {
     setMethod(m);
     setStep('input');
@@ -210,10 +444,7 @@ export default function Home() {
     setGuided((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    setError(null);
-
+  const buildInput = (): DonorInput => {
     const input: DonorInput = {
       method: method!,
       nonprofitContext: nonprofitContext || undefined,
@@ -231,6 +462,24 @@ export default function Home() {
         break;
     }
 
+    return input;
+  };
+
+  const handleSubmit = async (keepBrainstorming = false) => {
+    if (keepBrainstorming) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
+    setError(null);
+
+    const input = buildInput();
+
+    // If brainstorming more, pass existing titles so AI doesn't repeat
+    if (keepBrainstorming && allSuggestions.length > 0) {
+      input.previousSuggestions = allSuggestions.map((s) => s.title);
+    }
+
     try {
       const res = await fetch('/api/suggest', {
         method: 'POST',
@@ -244,28 +493,51 @@ export default function Home() {
       }
 
       const data: SuggestionsResponse = await res.json();
-      setResults(data);
+
+      if (keepBrainstorming) {
+        // Append new suggestions
+        setAllSuggestions((prev) => [...prev, ...data.suggestions]);
+      } else {
+        setAllSuggestions(data.suggestions);
+        setDonorSummary(data.donorSummary);
+        setSelectedIds(new Set());
+      }
       setStep('results');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
+  };
+
+  const toggleSelected = (index: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
   };
 
   const startOver = () => {
     setStep('select');
     setMethod(null);
-    setResults(null);
+    setAllSuggestions([]);
+    setDonorSummary('');
     setError(null);
     setFreetext('');
     setGuided({ donorType: 'individual' });
     setSocialText('');
     setNonprofitContext('');
+    setSelectedIds(new Set());
   };
 
-  const hiddenGemsCount =
-    results?.suggestions.filter((s) => s.isHiddenGem).length || 0;
+  const hiddenGemsCount = allSuggestions.filter((s) => s.isHiddenGem).length;
+  const selectedItems = Array.from(selectedIds).map((i) => allSuggestions[i]);
 
   return (
     <div className="min-h-screen bg-cream-50">
@@ -358,6 +630,27 @@ export default function Home() {
                 </p>
               </button>
             </div>
+
+            {/* Social proof / encouragement */}
+            <div className="mt-12 text-center">
+              <p className="text-sm text-navy-600 mb-4 font-medium">
+                People are always surprised by what they can offer
+              </p>
+              <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
+                {[
+                  '"I had no idea my backyard could be worth $2,000"',
+                  '"A cooking lesson? That brought in $800!"',
+                  '"My parking spot raised $600 for the school"',
+                ].map((quote, i) => (
+                  <span
+                    key={i}
+                    className="text-xs text-navy-600 bg-cream-100 px-3 py-1.5 rounded-full"
+                  >
+                    {quote}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
@@ -385,7 +678,7 @@ export default function Home() {
                 <textarea
                   value={freetext}
                   onChange={(e) => setFreetext(e.target.value)}
-                  placeholder="Example: I'm a dentist who loves sailing. I have a vacation condo in Hilton Head and I'm also a pretty good amateur photographer. My wife runs a catering business..."
+                  placeholder={"Example: I'm a dentist who loves sailing. I have a vacation condo in Hilton Head and I'm also a pretty good amateur photographer. My wife runs a catering business..."}
                   rows={6}
                   className="w-full rounded-xl border border-brand-100 p-4 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent resize-none text-sm"
                 />
@@ -399,8 +692,8 @@ export default function Home() {
                   Let&apos;s find what you could offer
                 </h2>
                 <p className="text-navy-600 mb-6">
-                  A few quick details and we&apos;ll discover offerings you didn&apos;t
-                  know you had.
+                  A few quick details and we&apos;ll discover offerings you
+                  didn&apos;t know you had.
                 </p>
 
                 {/* Donor type toggle */}
@@ -521,7 +814,7 @@ export default function Home() {
                 <textarea
                   value={socialText}
                   onChange={(e) => setSocialText(e.target.value)}
-                  placeholder={"Paste your LinkedIn About section, Instagram bio, website About page, or just your profile URL here...\n\nTip: On LinkedIn, go to your profile → click your About section → copy the text"}
+                  placeholder={"Paste your LinkedIn About section, Instagram bio, website About page, or just your profile URL here...\n\nTip: On LinkedIn, go to your profile \u2192 click your About section \u2192 copy the text"}
                   rows={8}
                   className="w-full rounded-xl border border-brand-100 p-4 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent resize-none text-sm"
                 />
@@ -550,7 +843,7 @@ export default function Home() {
             )}
 
             <button
-              onClick={handleSubmit}
+              onClick={() => handleSubmit(false)}
               disabled={
                 loading ||
                 (method === 'freetext' && !freetext.trim()) ||
@@ -572,54 +865,114 @@ export default function Home() {
         )}
 
         {/* Loading */}
-        {loading && <LoadingSkeleton />}
+        {loading && <LoadingSkeleton isMore={false} />}
 
         {/* ─── STEP 3: Results ─── */}
-        {step === 'results' && results && (
-          <div className="animate-fade-in">
+        {step === 'results' && !loading && (
+          <div className="animate-fade-in" ref={resultsRef}>
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-navy-800 mb-2 tracking-tight">
                 Here&apos;s what you could offer
               </h2>
               <p className="text-navy-600 max-w-lg mx-auto mb-4">
-                {results.donorSummary}
+                {donorSummary}
               </p>
-              {hiddenGemsCount > 0 && (
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-full">
-                  <Gem className="w-4 h-4 text-amber-600" />
-                  <span className="text-sm font-medium text-amber-800">
-                    {hiddenGemsCount} Hidden Gem
-                    {hiddenGemsCount > 1 ? 's' : ''} — costs you little,
-                    worth a lot to bidders
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                {hiddenGemsCount > 0 && (
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-full">
+                    <Gem className="w-4 h-4 text-amber-600" />
+                    <span className="text-sm font-medium text-amber-800">
+                      {hiddenGemsCount} Hidden Gem
+                      {hiddenGemsCount > 1 ? 's' : ''} — costs you little,
+                      worth a lot to bidders
+                    </span>
+                  </div>
+                )}
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-50 border border-brand-200 rounded-full">
+                  <span className="text-sm font-medium text-brand-700">
+                    {allSuggestions.length} offering
+                    {allSuggestions.length > 1 ? 's' : ''} discovered
                   </span>
                 </div>
-              )}
+              </div>
+            </div>
+
+            {/* Instruction for selecting */}
+            <div className="max-w-3xl mx-auto mb-4">
+              <p className="text-sm text-navy-600 text-center">
+                Tap the circle on any offerings you&apos;d like to share with
+                your organization, then hit{' '}
+                <span className="font-semibold">Share with Org</span> below.
+              </p>
             </div>
 
             <div className="max-w-3xl mx-auto space-y-4">
-              {results.suggestions.map((item, i) => (
-                <SuggestionCard key={i} item={item} index={i} />
+              {allSuggestions.map((item, i) => (
+                <SuggestionCard
+                  key={`${i}-${item.title}`}
+                  item={item}
+                  index={i < 8 ? i : 0}
+                  selectable={true}
+                  selected={selectedIds.has(i)}
+                  onToggle={() => toggleSelected(i)}
+                />
               ))}
             </div>
 
-            <div className="max-w-3xl mx-auto mt-8 text-center">
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            {/* Keep Brainstorming / Loading More */}
+            {loadingMore && (
+              <div className="max-w-3xl mx-auto mt-6">
+                <div className="flex items-center justify-center gap-3 py-8">
+                  <Loader2 className="w-5 h-5 text-brand-500 animate-spin" />
+                  <span className="text-navy-600 font-medium">
+                    Brainstorming more ideas...
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="max-w-3xl mx-auto mt-8">
+              {/* Primary actions */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                {/* Share with Org — primary CTA */}
                 <button
-                  onClick={handleSubmit}
-                  className="px-6 py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition-all flex items-center justify-center gap-2 shadow-sm"
+                  onClick={() => setShowShareModal(true)}
+                  disabled={selectedIds.size === 0}
+                  className={`flex-1 px-6 py-3.5 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${
+                    selectedIds.size > 0
+                      ? 'bg-brand-600 text-white hover:bg-brand-700 shadow-sm hover:shadow-md'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  <Send className="w-5 h-5" />
+                  {selectedIds.size > 0
+                    ? `Share ${selectedIds.size} Offering${selectedIds.size > 1 ? 's' : ''} with Org`
+                    : 'Select offerings to share'}
+                </button>
+
+                {/* Keep Brainstorming */}
+                <button
+                  onClick={() => handleSubmit(true)}
+                  disabled={loadingMore}
+                  className="flex-1 px-6 py-3.5 rounded-xl bg-white border border-brand-200 text-navy-700 font-semibold hover:bg-cream-50 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                 >
                   <Lightbulb className="w-5 h-5" />
-                  Discover More Offerings
+                  Keep Brainstorming
                 </button>
+              </div>
+
+              {/* Secondary actions */}
+              <div className="flex justify-center mt-4">
                 <button
                   onClick={startOver}
-                  className="px-6 py-3 rounded-xl bg-white border border-brand-200 text-navy-700 font-semibold hover:bg-cream-50 transition-all flex items-center justify-center gap-2"
+                  className="text-sm text-navy-600 hover:text-navy-800 flex items-center gap-1.5 transition-colors"
                 >
-                  <RotateCcw className="w-5 h-5" />
+                  <RotateCcw className="w-4 h-4" />
                   Start Over
                 </button>
               </div>
-              <p className="mt-6 text-xs text-navy-600">
+
+              <p className="mt-6 text-xs text-navy-600 text-center">
                 Built by{' '}
                 <a
                   href="https://betterworld.org"
@@ -634,6 +987,15 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <ShareModal
+          selectedItems={selectedItems}
+          donorSummary={donorSummary}
+          onClose={() => setShowShareModal(false)}
+        />
+      )}
     </div>
   );
 }
