@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
   try {
     const body: SharePayload = await request.json();
 
-    if (!body.donorName || !body.donorEmail || !body.orgEmail || !body.selectedOfferings?.length) {
+    if (!body.donorName || !body.donorEmail || !body.selectedOfferings?.length) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }

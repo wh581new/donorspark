@@ -48,7 +48,7 @@ export interface SuggestionsResponse {
 export interface SharePayload {
   donorName: string;
   donorEmail: string;
-  orgEmail: string;
+  orgEmail?: string;
   orgName: string;
   selectedOfferings: AuctionSuggestion[];
   donorSummary: string;

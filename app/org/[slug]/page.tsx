@@ -396,14 +396,12 @@ function LoadingState({ isMore }: { isMore: boolean }) {
 function ShareModal({
   selectedItems,
   donorSummary,
-  orgId,
   orgName,
   brandColor,
   onClose,
 }: {
   selectedItems: AuctionSuggestion[];
   donorSummary: string;
-  orgId: string;
   orgName: string;
   brandColor: string;
   onClose: () => void;
@@ -425,21 +423,16 @@ function ShareModal({
     setError(null);
 
     try {
-      const res = await fetch(`/api/org/${orgId}/share`, {
+      const res = await fetch('/api/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name,
-          email,
-          message,
+          donorName: name,
+          donorEmail: email,
+          orgName,
+          orgEmail: '', // resolved server-side
           donorSummary,
-          offerings: selectedItems.map(s => ({
-            title: s.title,
-            description: s.description,
-            estimatedValue: s.estimatedValue,
-            donorCost: s.donorCost,
-            whyItWorks: s.whyItWorks,
-          })),
+          selectedOfferings: selectedItems,
         }),
       });
 
@@ -984,8 +977,6 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       >
                         <option value="individual">Individual Donor</option>
                         <option value="business">Business Owner</option>
-                        <option value="professional">Professional</option>
-                        <option value="other">Other</option>
                       </select>
                     </motion.div>
 
@@ -1141,7 +1132,6 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                   <ShareModal
                     selectedItems={selectedItems}
                     donorSummary={donorSummary}
-                    orgId={org.id}
                     orgName={org.name}
                     brandColor={brandColor}
                     onClose={() => setShowShareModal(false)}
