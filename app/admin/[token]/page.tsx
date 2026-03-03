@@ -717,7 +717,7 @@ export default function AdminDashboard() {
           <div className="text-center pt-8 pb-4">
             <p className="text-xs text-gray-400">
               Powered by{' '}
-              <a href="https://whatcouldioffer.com" target="_blank" rel="noopener noreferrer" className="font-medium text-gray-500 hover:text-gray-700 transition-colors">
+              <a href="/" target="_blank" rel="noopener noreferrer" className="font-medium text-gray-500 hover:text-gray-700 transition-colors">
                 What Could I Offer?
               </a>
               {' · '}
