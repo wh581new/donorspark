@@ -18,6 +18,9 @@ import {
   Zap,
   ChevronRight,
   ArrowUpRight,
+  Upload,
+  X,
+  Image as ImageIcon,
 } from 'lucide-react'
 
 /* ────────────────────────────────────────────────
@@ -36,14 +39,10 @@ function BetterWorldLogo({ className = '', color = '#3d5566' }: { className?: st
 /* ────────────────────────────────────────────────
    Constants & animation config
    ──────────────────────────────────────────────── */
-const BRAND_COLORS = [
-  { name: 'Sage', value: '#6b8b74' },
-  { name: 'Ocean', value: '#3b82f6' },
-  { name: 'Coral', value: '#ef4444' },
-  { name: 'Violet', value: '#8b5cf6' },
-  { name: 'Amber', value: '#f59e0b' },
-  { name: 'Slate', value: '#64748b' },
-] as const
+const PRESET_COLORS = [
+  '#6b8b74', '#3b82f6', '#ef4444', '#8b5cf6', '#f59e0b', '#64748b',
+  '#e11d48', '#0891b2', '#16a34a', '#9333ea', '#ea580c', '#475569',
+]
 
 const ease = [0.22, 1, 0.36, 1] as const
 
@@ -77,6 +76,42 @@ export default function Home() {
 
   const [copiedField, setCopiedField] = useState<string | null>(null)
   const [showKonami, setShowKonami] = useState(false)
+  const [logoPreview, setLogoPreview] = useState<string | null>(null)
+  const [dragActive, setDragActive] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleLogoFile = (file: File) => {
+    if (!file.type.startsWith('image/')) return
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Logo must be under 2MB')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string
+      setLogoPreview(dataUrl)
+      setFormData((prev) => ({ ...prev, logoUrl: dataUrl }))
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleLogoDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragActive(false)
+    const file = e.dataTransfer.files[0]
+    if (file) handleLogoFile(file)
+  }
+
+  const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) handleLogoFile(file)
+  }
+
+  const removeLogo = () => {
+    setLogoPreview(null)
+    setFormData((prev) => ({ ...prev, logoUrl: '' }))
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
   const formRef = useRef<HTMLDivElement>(null)
   const formInView = useInView(formRef, { once: true, margin: '-80px' })
@@ -397,9 +432,9 @@ export default function Home() {
                 </div>
                 <div className="hidden sm:flex gap-6">
                   {[
-                    { val: '5 min', sub: 'setup' },
+                    { val: '2 min', sub: 'setup' },
                     { val: '30%', sub: 'more items' },
-                    { val: '100K+', sub: 'orgs served' },
+                    { val: 'Free', sub: 'forever' },
                   ].map((s, i) => (
                     <div key={i} className="text-right">
                       <p className="text-white text-xl font-semibold">{s.val}</p>
@@ -613,18 +648,56 @@ export default function Home() {
               />
             </div>
 
-            {/* Logo URL */}
+            {/* Logo Upload */}
             <div>
               <label className="text-sm font-medium text-gray-700 mb-1.5 block">
-                Logo URL <span className="text-gray-400 font-normal">(optional)</span>
+                Logo <span className="text-gray-400 font-normal">(optional)</span>
               </label>
               <input
-                type="url"
-                value={formData.logoUrl}
-                onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
-                placeholder="https://yoursite.org/logo.png"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-100 transition-all text-[15px] placeholder:text-gray-400 bg-white"
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleLogoSelect}
+                className="hidden"
               />
+              {logoPreview ? (
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <img src={logoPreview} alt="Logo preview" className="w-12 h-12 rounded-lg object-cover" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-700 truncate">Logo uploaded</p>
+                    <p className="text-xs text-gray-400">Click to replace or drag a new one</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeLogo}
+                    className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setDragActive(true) }}
+                  onDragLeave={() => setDragActive(false)}
+                  onDrop={handleLogoDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`flex flex-col items-center justify-center gap-2 py-6 px-4 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                    dragActive
+                      ? 'border-gray-400 bg-gray-50'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50'
+                  }`}
+                >
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                    <ImageIcon className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-gray-500">
+                      <span className="text-gray-700 font-medium">Click to upload</span> or drag and drop
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5">PNG, JPG, SVG up to 2MB</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Brand Color */}
@@ -632,26 +705,38 @@ export default function Home() {
               <label className="text-sm font-medium text-gray-700 mb-3 block">
                 Brand color
               </label>
-              <div className="flex gap-3">
-                {BRAND_COLORS.map((color) => (
-                  <button
-                    key={color.value}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, brandColor: color.value })}
-                    className={`w-10 h-10 rounded-full transition-all ${
-                      formData.brandColor === color.value
-                        ? 'ring-2 ring-offset-2 ring-gray-900 scale-110'
-                        : 'hover:scale-110'
-                    }`}
-                    style={{ backgroundColor: color.value }}
-                    title={color.name}
-                  >
-                    {formData.brandColor === color.value && (
-                      <Check className="w-4 h-4 text-white mx-auto" />
-                    )}
-                  </button>
-                ))}
+              <div className="flex items-center gap-4">
+                {/* Color wheel input */}
+                <div className="relative group">
+                  <input
+                    type="color"
+                    value={formData.brandColor}
+                    onChange={(e) => setFormData({ ...formData, brandColor: e.target.value })}
+                    className="w-14 h-14 rounded-2xl cursor-pointer border-2 border-gray-200 hover:border-gray-300 transition-all appearance-none bg-transparent [&::-webkit-color-swatch-wrapper]:p-1 [&::-webkit-color-swatch]:rounded-xl [&::-webkit-color-swatch]:border-none [&::-moz-color-swatch]:rounded-xl [&::-moz-color-swatch]:border-none"
+                  />
+                </div>
+                {/* Quick presets */}
+                <div className="flex flex-wrap gap-2 flex-1">
+                  {PRESET_COLORS.map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, brandColor: color })}
+                      className={`w-7 h-7 rounded-full transition-all ${
+                        formData.brandColor === color
+                          ? 'ring-2 ring-offset-1 ring-gray-900 scale-110'
+                          : 'hover:scale-110'
+                      }`}
+                      style={{ backgroundColor: color }}
+                    >
+                      {formData.brandColor === color && (
+                        <Check className="w-3 h-3 text-white mx-auto" />
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
+              <p className="text-xs text-gray-400 mt-2">Click the color wheel or pick a preset</p>
             </div>
 
             {/* Message */}
