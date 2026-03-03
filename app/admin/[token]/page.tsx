@@ -402,15 +402,62 @@ function SubmissionCard({
    Empty State
    ═══════════════════════════════════════════════ */
 function EmptyState() {
+  const [clickCount, setClickCount] = useState(0);
+  const [message, setMessage] = useState('');
+
+  const messages = [
+    '',
+    '👋 Hey there!',
+    '🎯 Still waiting for donors...',
+    '☕ Maybe grab a coffee while you wait?',
+    '🚀 Great things take time!',
+    '🦄 You found the secret! You&apos;re a dashboard power user!',
+  ];
+
+  const handleClick = () => {
+    const next = Math.min(clickCount + 1, messages.length - 1);
+    setClickCount(next);
+    setMessage(messages[next]);
+  };
+
   return (
     <motion.div variants={fadeUp} className="flex flex-col items-center justify-center py-20 px-4">
-      <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-5">
-        <Inbox className="w-8 h-8 text-gray-300" />
-      </div>
+      <motion.button
+        onClick={handleClick}
+        whileTap={{ scale: 0.9 }}
+        className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-5 cursor-pointer hover:bg-gray-100 transition-colors"
+      >
+        <motion.div
+          animate={clickCount >= 5 ? { rotate: [0, -10, 10, -10, 0] } : {}}
+          transition={{ duration: 0.5 }}
+        >
+          <Inbox className={`w-8 h-8 transition-colors ${clickCount >= 5 ? 'text-emerald-500' : 'text-gray-300'}`} />
+        </motion.div>
+      </motion.button>
       <h3 className="text-lg font-semibold text-gray-900 mb-2">No submissions yet</h3>
-      <p className="text-sm text-gray-500 text-center max-w-sm leading-relaxed">
-        Share your donor link to start receiving offerings. They&apos;ll appear here as they come in.
-      </p>
+      <AnimatePresence mode="wait">
+        {message ? (
+          <motion.p
+            key={message}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className={`text-sm text-center max-w-sm leading-relaxed ${clickCount >= 5 ? 'text-emerald-600 font-medium' : 'text-gray-500'}`}
+          >
+            {message}
+          </motion.p>
+        ) : (
+          <motion.p
+            key="default"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-sm text-gray-500 text-center max-w-sm leading-relaxed"
+          >
+            Share your donor link to start receiving offerings. They&apos;ll appear here as they come in.
+          </motion.p>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

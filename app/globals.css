@@ -144,6 +144,27 @@ body {
 }
 
 /* ═══════════════════════════════════════════════
+   Rainbow hue-rotate (footer easter egg)
+   ═══════════════════════════════════════════════ */
+@keyframes rainbowHue {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+.group:hover .hover-rainbow {
+  animation: rainbowHue 2s linear infinite;
+}
+
+/* ═══════════════════════════════════════════════
+   Easter egg wiggle
+   ═══════════════════════════════════════════════ */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+}
+
+/* ═══════════════════════════════════════════════
    Apple-style focus ring
    ═══════════════════════════════════════════════ */
 input:focus-visible,

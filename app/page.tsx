@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import {
   Check,
@@ -76,9 +76,27 @@ export default function Home() {
   } | null>(null)
 
   const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [showKonami, setShowKonami] = useState(false)
 
   const formRef = useRef<HTMLDivElement>(null)
   const formInView = useInView(formRef, { once: true, margin: '-80px' })
+
+  useEffect(() => {
+    const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a']
+    let buffer: string[] = []
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      buffer.push(e.key)
+      buffer = buffer.slice(-10)
+      if (buffer.join(',') === konamiSequence.join(',')) {
+        setShowKonami(true)
+        setTimeout(() => setShowKonami(false), 3000)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -238,6 +256,19 @@ export default function Home() {
   /* ──────── Main Marketing Page ──────── */
   return (
     <div className="min-h-screen bg-[#fafbfc]">
+      <AnimatePresence>
+        {showKonami && (
+          <motion.div
+            initial={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl text-sm font-medium flex items-center gap-2"
+          >
+            🎮 Achievement Unlocked: Secret Donor Mode!
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── Nav ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100/80">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -658,8 +689,15 @@ export default function Home() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-400">Powered by</span>
-            <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer">
-              <BetterWorldLogo className="h-5 w-auto" color="#6b7280" />
+            <a
+              href="https://betterworld.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group"
+            >
+              <div className="transition-all duration-500 group-hover:animate-gradient" style={{ filter: 'grayscale(0)' }}>
+                <BetterWorldLogo className="h-5 w-auto transition-all duration-500 group-hover:scale-110" color="#6b7280" />
+              </div>
             </a>
           </div>
           <div className="flex gap-8 text-sm text-gray-400">

@@ -477,6 +477,7 @@ function ShareModal({
               onClick={onClose}
               disabled={sending}
               className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+              aria-label="Close share dialog"
             >
               <X className="w-5 h-5 text-gray-600" />
             </button>
@@ -634,6 +635,8 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
   const [donorSummary, setDonorSummary] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [showShareModal, setShowShareModal] = useState(false);
+  const [logoClicks, setLogoClicks] = useState(0);
+  const [showEasterEgg, setShowEasterEgg] = useState(false);
 
   // Form state
   const [freetext, setFreetext] = useState('');
@@ -777,13 +780,31 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
         <div className="max-w-5xl mx-auto px-4 py-4 sm:py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              {org.logoUrl ? (
-                <img src={org.logoUrl} alt={org.name} className="w-9 h-9 rounded-lg object-cover" />
-              ) : (
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: brandColor }}>
-                  {org.name.charAt(0)}
-                </div>
-              )}
+              <div
+                onClick={() => {
+                  const next = logoClicks + 1;
+                  setLogoClicks(next);
+                  if (next === 7) {
+                    setShowEasterEgg(true);
+                    setTimeout(() => setShowEasterEgg(false), 3000);
+                    setLogoClicks(0);
+                  }
+                }}
+                className="cursor-pointer"
+              >
+                {org.logoUrl ? (
+                  <img src={org.logoUrl} alt={org.name} className="w-9 h-9 rounded-lg object-cover" />
+                ) : (
+                  <motion.div
+                    className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+                    style={{ backgroundColor: brandColor }}
+                    animate={showEasterEgg ? { rotate: [0, 360], scale: [1, 1.3, 1] } : {}}
+                    transition={{ duration: 0.6 }}
+                  >
+                    {org.name.charAt(0)}
+                  </motion.div>
+                )}
+              </div>
               <div>
                 <h1 className="text-sm font-semibold text-gray-900">{org.name}</h1>
                 <p className="text-xs text-gray-500">powered by betterworld</p>
@@ -795,6 +816,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                 whileTap={{ scale: 0.95 }}
                 onClick={startOver}
                 className="text-xs text-gray-600 hover:text-gray-900 flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-all font-medium"
+                aria-label="Start over"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 Start over
@@ -803,6 +825,21 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
           </div>
         </div>
       </header>
+
+      {/* Easter egg toast */}
+      <AnimatePresence>
+        {showEasterEgg && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: -20, x: '-50%' }}
+            className="fixed top-20 left-1/2 z-50 bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3"
+          >
+            <span className="text-xl">🦄</span>
+            <span className="text-sm font-medium">You found the secret! You&apos;re clearly a power user.</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <main className="max-w-5xl mx-auto px-4 py-8 pb-32">
         {/* Progress */}
@@ -936,6 +973,13 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
           {step === 'input' && method && (
             <motion.div key="input" {...pageTransition} className="max-w-2xl mx-auto">
               <div className="mb-8">
+                <button
+                  onClick={() => setStep('select')}
+                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4 transition-colors"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  Back to methods
+                </button>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
                   {method === 'freetext'
                     ? 'Tell us about yourself'
@@ -961,6 +1005,16 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       onChange={setFreetext}
                       multiline
                     />
+                    {freetext.toLowerCase().includes('magic') && (
+                      <motion.p
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="text-xs text-purple-600 flex items-center gap-1.5"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        Ooh, magic? We love a good magician at auctions!
+                      </motion.p>
+                    )}
                   </>
                 )}
 
@@ -1052,12 +1106,45 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
           {/* ═══ STEP 3: Results ═══ */}
           {step === 'results' && (
             <motion.div key="results" {...pageTransition} ref={resultsRef}>
-              <div className="mb-10">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Your personalized offerings</h2>
-                <p className="text-gray-600">
-                  We found {allSuggestions.length} offering{allSuggestions.length !== 1 ? 's' : ''} tailored to you
-                  {hiddenGemsCount > 0 && ` (including ${hiddenGemsCount} hidden gem${hiddenGemsCount !== 1 ? 's' : ''})`}
-                </p>
+              <motion.div
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 0 }}
+                transition={{ delay: 2, duration: 0.5 }}
+                className="text-center mb-6"
+              >
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: [0, 1.2, 1] }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] as const }}
+                  className="inline-block text-4xl"
+                >
+                  🎉
+                </motion.span>
+              </motion.div>
+              <div className="mb-10 flex items-end justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Your personalized offerings</h2>
+                  <p className="text-gray-600">
+                    We found {allSuggestions.length} offering{allSuggestions.length !== 1 ? 's' : ''} tailored to you
+                    {hiddenGemsCount > 0 && ` (including ${hiddenGemsCount} hidden gem${hiddenGemsCount !== 1 ? 's' : ''})`}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    if (selectedIds.size === allSuggestions.length) {
+                      setSelectedIds(new Set());
+                    } else {
+                      setSelectedIds(new Set(allSuggestions.map((_, i) => i)));
+                    }
+                  }}
+                  className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-emerald-50"
+                >
+                  {selectedIds.size === allSuggestions.length ? (
+                    <><X className="w-3.5 h-3.5" /> Deselect all</>
+                  ) : (
+                    <><CheckCircle2 className="w-3.5 h-3.5" /> Select all</>
+                  )}
+                </button>
               </div>
 
               {/* Donor Summary */}
