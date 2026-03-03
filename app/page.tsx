@@ -49,7 +49,7 @@ function SuggestionCard({
 
   return (
     <div
-      className="animate-slide-up bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+      className="animate-slide-up bg-white rounded-2xl border border-brand-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
       style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
     >
       <div className="p-6">
@@ -66,13 +66,13 @@ function SuggestionCard({
                 </span>
               )}
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-navy-800">
               {item.title}
             </h3>
           </div>
         </div>
 
-        <p className="text-gray-600 text-sm leading-relaxed mb-4">
+        <p className="text-navy-600 text-sm leading-relaxed mb-4">
           {item.description}
         </p>
 
@@ -97,7 +97,7 @@ function SuggestionCard({
           </div>
         </div>
 
-        <p className="text-xs text-gray-500 italic mb-3">
+        <p className="text-xs text-navy-600 italic mb-3">
           {item.whyItWorks}
         </p>
 
@@ -117,9 +117,9 @@ function SuggestionCard({
         </button>
 
         {expanded && (
-          <div className="mt-3 bg-gray-50 rounded-xl p-4 animate-fade-in">
+          <div className="mt-3 bg-cream-100 rounded-xl p-4 animate-fade-in">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-navy-600 uppercase tracking-wider">
                 Ready-to-Use Catalog Description
               </span>
               <button
@@ -137,7 +137,7 @@ function SuggestionCard({
                 )}
               </button>
             </div>
-            <p className="text-sm text-gray-700 leading-relaxed italic">
+            <p className="text-sm text-navy-700 leading-relaxed italic">
               &ldquo;{item.catalogDescription}&rdquo;
             </p>
           </div>
@@ -154,16 +154,16 @@ function LoadingSkeleton() {
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-3 mb-3">
           <Loader2 className="w-6 h-6 text-brand-500 animate-spin" />
-          <span className="text-lg font-medium text-gray-700">
-            AI is analyzing your profile and crafting suggestions...
+          <span className="text-lg font-medium text-navy-700">
+            Analyzing your profile and crafting suggestions...
           </span>
         </div>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-navy-600">
           Finding your hidden gems — this takes 10-20 seconds
         </p>
       </div>
       {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-white rounded-2xl border border-gray-100 p-6">
+        <div key={i} className="bg-white rounded-2xl border border-brand-100 p-6">
           <div className="skeleton h-5 w-24 mb-3" />
           <div className="skeleton h-6 w-3/4 mb-3" />
           <div className="skeleton h-4 w-full mb-2" />
@@ -268,19 +268,19 @@ export default function Home() {
     results?.suggestions.filter((s) => s.isHiddenGem).length || 0;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-cream-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-100">
+      <header className="bg-cream-100 border-b border-brand-100">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-brand-500 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900 leading-tight">
+              <h1 className="text-lg font-bold text-navy-800 leading-tight tracking-tight">
                 DonorSpark
               </h1>
-              <p className="text-[11px] text-gray-400 leading-tight">
+              <p className="text-[11px] text-brand-600 leading-tight">
                 by BetterWorld
               </p>
             </div>
@@ -288,7 +288,7 @@ export default function Home() {
           {step !== 'select' && (
             <button
               onClick={startOver}
-              className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1.5 transition-colors"
+              className="text-sm text-navy-600 hover:text-navy-800 flex items-center gap-1.5 transition-colors"
             >
               <RotateCcw className="w-4 h-4" />
               Start over
@@ -302,11 +302,11 @@ export default function Home() {
         {step === 'select' && (
           <div className="animate-fade-in">
             <div className="text-center mb-10">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
+              <h2 className="text-3xl sm:text-4xl font-bold text-navy-800 mb-3 tracking-tight">
                 Discover what you can offer
               </h2>
-              <p className="text-lg text-gray-500 max-w-xl mx-auto">
-                AI finds creative, high-value auction items you never knew you
+              <p className="text-lg text-navy-600 max-w-xl mx-auto leading-relaxed">
+                Uncover creative, high-value auction items you never knew you
                 had. Tell us about yourself and we&apos;ll do the rest.
               </p>
             </div>
@@ -314,45 +314,45 @@ export default function Home() {
             <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
               <button
                 onClick={() => selectMethod('freetext')}
-                className="group text-left p-6 bg-white rounded-2xl border-2 border-gray-100 hover:border-brand-300 hover:shadow-lg transition-all duration-200"
+                className="group text-left p-6 bg-white rounded-2xl border border-brand-100 hover:border-brand-300 hover:shadow-md transition-all duration-200"
               >
-                <div className="w-12 h-12 rounded-xl bg-brand-50 group-hover:bg-brand-100 flex items-center justify-center mb-4 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-cream-100 group-hover:bg-brand-50 flex items-center justify-center mb-4 transition-colors">
                   <MessageSquareText className="w-6 h-6 text-brand-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">
+                <h3 className="font-semibold text-navy-800 mb-1">
                   Tell Us About You
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-navy-600">
                   Describe yourself or your business in your own words
                 </p>
               </button>
 
               <button
                 onClick={() => selectMethod('guided')}
-                className="group text-left p-6 bg-white rounded-2xl border-2 border-gray-100 hover:border-brand-300 hover:shadow-lg transition-all duration-200"
+                className="group text-left p-6 bg-white rounded-2xl border border-brand-100 hover:border-brand-300 hover:shadow-md transition-all duration-200"
               >
-                <div className="w-12 h-12 rounded-xl bg-brand-50 group-hover:bg-brand-100 flex items-center justify-center mb-4 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-cream-100 group-hover:bg-brand-50 flex items-center justify-center mb-4 transition-colors">
                   <ClipboardList className="w-6 h-6 text-brand-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">
+                <h3 className="font-semibold text-navy-800 mb-1">
                   Guided Questions
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-navy-600">
                   Answer a few quick questions and we&apos;ll find your gems
                 </p>
               </button>
 
               <button
                 onClick={() => selectMethod('social')}
-                className="group text-left p-6 bg-white rounded-2xl border-2 border-gray-100 hover:border-brand-300 hover:shadow-lg transition-all duration-200"
+                className="group text-left p-6 bg-white rounded-2xl border border-brand-100 hover:border-brand-300 hover:shadow-md transition-all duration-200"
               >
-                <div className="w-12 h-12 rounded-xl bg-brand-50 group-hover:bg-brand-100 flex items-center justify-center mb-4 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-cream-100 group-hover:bg-brand-50 flex items-center justify-center mb-4 transition-colors">
                   <Linkedin className="w-6 h-6 text-brand-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">
+                <h3 className="font-semibold text-navy-800 mb-1">
                   Paste Your Profile
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-navy-600">
                   Share your LinkedIn bio or social profile text
                 </p>
               </button>
@@ -365,7 +365,7 @@ export default function Home() {
           <div className="max-w-2xl mx-auto animate-fade-in">
             <button
               onClick={() => setStep('select')}
-              className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 mb-6 transition-colors"
+              className="text-sm text-navy-600 hover:text-navy-800 flex items-center gap-1 mb-6 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
@@ -373,10 +373,10 @@ export default function Home() {
             {/* Free Text */}
             {method === 'freetext' && (
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="text-2xl font-bold text-navy-800 mb-2">
                   Tell us about yourself
                 </h2>
-                <p className="text-gray-500 mb-6">
+                <p className="text-navy-600 mb-6">
                   The more detail, the better our suggestions. Mention your
                   profession, hobbies, skills, assets, business type — anything
                   that makes you unique.
@@ -386,7 +386,7 @@ export default function Home() {
                   onChange={(e) => setFreetext(e.target.value)}
                   placeholder="Example: I'm a dentist who loves sailing. I have a vacation condo in Hilton Head and I'm also a pretty good amateur photographer. My wife runs a catering business..."
                   rows={6}
-                  className="w-full rounded-xl border border-gray-200 p-4 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent resize-none text-sm"
+                  className="w-full rounded-xl border border-brand-100 p-4 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent resize-none text-sm"
                 />
               </div>
             )}
@@ -394,10 +394,10 @@ export default function Home() {
             {/* Guided */}
             {method === 'guided' && (
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="text-2xl font-bold text-navy-800 mb-2">
                   A few quick questions
                 </h2>
-                <p className="text-gray-500 mb-6">
+                <p className="text-navy-600 mb-6">
                   We&apos;ll use these to find creative items you can offer.
                 </p>
 
@@ -407,8 +407,8 @@ export default function Home() {
                     onClick={() => setDonorType('individual')}
                     className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
                       donorType === 'individual'
-                        ? 'bg-brand-500 text-white shadow-md'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ? 'bg-brand-600 text-white shadow-md'
+                        : 'bg-cream-100 text-navy-600 hover:bg-cream-200'
                     }`}
                   >
                     Individual
@@ -417,8 +417,8 @@ export default function Home() {
                     onClick={() => setDonorType('business')}
                     className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
                       donorType === 'business'
-                        ? 'bg-brand-500 text-white shadow-md'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ? 'bg-brand-600 text-white shadow-md'
+                        : 'bg-cream-100 text-navy-600 hover:bg-cream-200'
                     }`}
                   >
                     Business
@@ -508,10 +508,10 @@ export default function Home() {
             {/* Social / LinkedIn */}
             {method === 'social' && (
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="text-2xl font-bold text-navy-800 mb-2">
                   Paste your profile
                 </h2>
-                <p className="text-gray-500 mb-6">
+                <p className="text-navy-600 mb-6">
                   Copy your LinkedIn &ldquo;About&rdquo; section, bio, or any
                   social profile text. You can also paste a URL and we&apos;ll
                   work with whatever info is there.
@@ -521,23 +521,23 @@ export default function Home() {
                   onChange={(e) => setSocialText(e.target.value)}
                   placeholder={"Paste your LinkedIn About section, Instagram bio, website About page, or just your profile URL here...\n\nTip: On LinkedIn, go to your profile → click your About section → copy the text"}
                   rows={8}
-                  className="w-full rounded-xl border border-gray-200 p-4 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent resize-none text-sm"
+                  className="w-full rounded-xl border border-brand-100 p-4 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent resize-none text-sm"
                 />
               </div>
             )}
 
             {/* Nonprofit context (all methods) */}
-            <div className="mt-6 pt-6 border-t border-gray-100">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <div className="mt-6 pt-6 border-t border-brand-100">
+              <label className="block text-sm font-medium text-navy-700 mb-1.5">
                 Auction context{' '}
-                <span className="text-gray-400 font-normal">(optional)</span>
+                <span className="text-navy-600 font-normal">(optional)</span>
               </label>
               <input
                 type="text"
                 value={nonprofitContext}
                 onChange={(e) => setNonprofitContext(e.target.value)}
                 placeholder="e.g. School gala, animal shelter fundraiser, community arts program..."
-                className="w-full rounded-xl border border-gray-200 p-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
+                className="w-full rounded-xl border border-brand-100 p-3 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
               />
             </div>
 
@@ -560,7 +560,7 @@ export default function Home() {
                   donorType === 'business' &&
                   !guided.businessName)
               }
-              className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 text-white font-semibold hover:from-brand-600 hover:to-brand-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+              className="mt-6 w-full py-3.5 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
             >
               <Sparkles className="w-5 h-5" />
               Find My Auction Items
@@ -576,10 +576,10 @@ export default function Home() {
         {step === 'results' && results && (
           <div className="animate-fade-in">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              <h2 className="text-3xl font-bold text-navy-800 mb-2 tracking-tight">
                 Your Auction Items
               </h2>
-              <p className="text-gray-500 max-w-lg mx-auto mb-4">
+              <p className="text-navy-600 max-w-lg mx-auto mb-4">
                 {results.donorSummary}
               </p>
               {hiddenGemsCount > 0 && (
@@ -604,21 +604,21 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                   onClick={handleSubmit}
-                  className="px-6 py-3 rounded-xl bg-white border-2 border-brand-200 text-brand-700 font-semibold hover:bg-brand-50 transition-all flex items-center justify-center gap-2"
+                  className="px-6 py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition-all flex items-center justify-center gap-2 shadow-sm"
                 >
                   <Lightbulb className="w-5 h-5" />
                   Generate More Ideas
                 </button>
                 <button
                   onClick={startOver}
-                  className="px-6 py-3 rounded-xl bg-white border-2 border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+                  className="px-6 py-3 rounded-xl bg-white border border-brand-200 text-navy-700 font-semibold hover:bg-cream-50 transition-all flex items-center justify-center gap-2"
                 >
                   <RotateCcw className="w-5 h-5" />
                   Start Over
                 </button>
               </div>
-              <p className="mt-6 text-xs text-gray-400">
-                Powered by AI &middot; Built by{' '}
+              <p className="mt-6 text-xs text-navy-600">
+                Built by{' '}
                 <a
                   href="https://betterworld.org"
                   target="_blank"
@@ -650,7 +650,7 @@ function InputField({
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+      <label className="block text-sm font-medium text-navy-700 mb-1.5">
         {label}
       </label>
       <input
@@ -658,7 +658,7 @@ function InputField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-xl border border-gray-200 p-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
+        className="w-full rounded-xl border border-brand-100 p-3 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
       />
     </div>
   );
