@@ -1,1029 +1,741 @@
-'use client';
+'use client'
 
-import { useState, useRef } from 'react';
+import { useState, useRef } from 'react'
+import { motion, AnimatePresence, useInView } from 'framer-motion'
 import {
-  Sparkles,
-  Lightbulb,
-  MessageSquareText,
-  ClipboardList,
-  Linkedin,
-  ArrowRight,
-  ArrowLeft,
-  Loader2,
-  Gem,
-  DollarSign,
-  Tag,
-  ChevronDown,
-  ChevronUp,
-  Copy,
   Check,
-  RotateCcw,
-  Send,
+  Copy,
   CheckCircle2,
-  Circle,
-  X,
-} from 'lucide-react';
-import {
-  DonorType,
-  InputMethod,
-  GuidedAnswers,
-  DonorInput,
-  AuctionSuggestion,
-  SuggestionsResponse,
-} from '@/lib/types';
+  ArrowRight,
+  Sparkles,
+  Heart,
+  Share2,
+  Settings,
+  Mail,
+  AlertCircle,
+  ChevronDown,
+  Clock,
+} from 'lucide-react'
 
-/* ─── Suggestion Card (now with select toggle) ─── */
-function SuggestionCard({
-  item,
-  index,
-  selectable,
-  selected,
-  onToggle,
-}: {
-  item: AuctionSuggestion;
-  index: number;
-  selectable: boolean;
-  selected: boolean;
-  onToggle: () => void;
-}) {
-  const [expanded, setExpanded] = useState(false);
-  const [copied, setCopied] = useState(false);
+const BRAND_COLORS = [
+  { name: 'Sage Green', value: '#6b8b74', tw: 'bg-brand-500' },
+  { name: 'Ocean Blue', value: '#3b82f6', tw: 'bg-blue-500' },
+  { name: 'Warm Coral', value: '#ef4444', tw: 'bg-red-500' },
+  { name: 'Royal Purple', value: '#8b5cf6', tw: 'bg-purple-500' },
+  { name: 'Amber Gold', value: '#f59e0b', tw: 'bg-amber-500' },
+  { name: 'Slate', value: '#64748b', tw: 'bg-slate-500' },
+] as const
 
-  const copyCatalog = () => {
-    navigator.clipboard.writeText(
-      `${item.title}\n\n${item.catalogDescription}`
-    );
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6 },
+} as const
 
-  return (
-    <div
-      className={`animate-slide-up bg-white rounded-2xl border shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden ${
-        selected ? 'border-brand-400 ring-2 ring-brand-200' : 'border-brand-100'
-      }`}
-      style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'both' }}
-    >
-      <div className="p-6">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="text-xs font-medium text-brand-700 bg-brand-50 px-2.5 py-0.5 rounded-full">
-                {item.category}
-              </span>
-              {item.isHiddenGem && (
-                <span className="text-xs font-medium text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                  <Gem className="w-3 h-3" />
-                  Hidden Gem
-                </span>
-              )}
-            </div>
-            <h3 className="text-lg font-semibold text-navy-800">
-              {item.title}
-            </h3>
-          </div>
-          {selectable && (
-            <button
-              onClick={onToggle}
-              className={`flex-shrink-0 mt-1 transition-colors ${
-                selected ? 'text-brand-600' : 'text-gray-300 hover:text-brand-400'
-              }`}
-              title={selected ? 'Remove from share list' : 'Add to share list'}
-            >
-              {selected ? (
-                <CheckCircle2 className="w-6 h-6" />
-              ) : (
-                <Circle className="w-6 h-6" />
-              )}
-            </button>
-          )}
-        </div>
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+} as const
 
-        <p className="text-navy-600 text-sm leading-relaxed mb-4">
-          {item.description}
-        </p>
+const easeInOutCubic = [0.4, 0, 0.2, 1] as const
 
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-green-50 rounded-xl p-3">
-            <div className="flex items-center gap-1.5 text-green-700 mb-0.5">
-              <DollarSign className="w-3.5 h-3.5" />
-              <span className="text-xs font-medium">Expected Bids</span>
-            </div>
-            <span className="text-sm font-bold text-green-800">
-              {item.estimatedValue}
-            </span>
-          </div>
-          <div className="bg-blue-50 rounded-xl p-3">
-            <div className="flex items-center gap-1.5 text-blue-700 mb-0.5">
-              <Tag className="w-3.5 h-3.5" />
-              <span className="text-xs font-medium">Your Cost</span>
-            </div>
-            <span className="text-sm font-bold text-blue-800">
-              {item.donorCost}
-            </span>
-          </div>
-        </div>
-
-        <p className="text-xs text-navy-600 italic mb-3">
-          {item.whyItWorks}
-        </p>
-
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="text-sm text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1 transition-colors"
-        >
-          {expanded ? (
-            <>
-              Hide catalog copy <ChevronUp className="w-4 h-4" />
-            </>
-          ) : (
-            <>
-              View auction catalog copy <ChevronDown className="w-4 h-4" />
-            </>
-          )}
-        </button>
-
-        {expanded && (
-          <div className="mt-3 bg-cream-100 rounded-xl p-4 animate-fade-in">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-navy-600 uppercase tracking-wider">
-                Ready-to-Use Catalog Description
-              </span>
-              <button
-                onClick={copyCatalog}
-                className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-1 transition-colors"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-3 h-3" /> Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3 h-3" /> Copy
-                  </>
-                )}
-              </button>
-            </div>
-            <p className="text-sm text-navy-700 leading-relaxed italic">
-              &ldquo;{item.catalogDescription}&rdquo;
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* ─── Loading Skeleton ─── */
-function LoadingSkeleton({ isMore }: { isMore: boolean }) {
-  return (
-    <div className="max-w-3xl mx-auto mt-8 space-y-6 animate-fade-in">
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center gap-3 mb-3">
-          <Loader2 className="w-6 h-6 text-brand-500 animate-spin" />
-          <span className="text-lg font-medium text-navy-700">
-            {isMore ? 'Brainstorming more ideas...' : 'Discovering what you could offer...'}
-          </span>
-        </div>
-        <p className="text-sm text-navy-600">
-          {isMore
-            ? 'Finding fresh offerings you haven\u2019t seen yet'
-            : 'Uncovering your hidden gems \u2014 this takes 10-20 seconds'}
-        </p>
-      </div>
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-white rounded-2xl border border-brand-100 p-6">
-          <div className="skeleton h-5 w-24 mb-3" />
-          <div className="skeleton h-6 w-3/4 mb-3" />
-          <div className="skeleton h-4 w-full mb-2" />
-          <div className="skeleton h-4 w-2/3 mb-4" />
-          <div className="grid grid-cols-2 gap-3">
-            <div className="skeleton h-16 w-full" />
-            <div className="skeleton h-16 w-full" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/* ─── Share Modal ─── */
-function ShareModal({
-  selectedItems,
-  donorSummary,
-  onClose,
-}: {
-  selectedItems: AuctionSuggestion[];
-  donorSummary: string;
-  onClose: () => void;
-}) {
-  const [donorName, setDonorName] = useState('');
-  const [donorEmail, setDonorEmail] = useState('');
-  const [orgEmail, setOrgEmail] = useState('');
-  const [orgName, setOrgName] = useState('');
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleShare = async () => {
-    if (!donorName.trim() || !donorEmail.trim() || !orgEmail.trim()) {
-      setError('Please fill in your name, email, and the organization\u2019s email.');
-      return;
-    }
-    setSending(true);
-    setError('');
-
-    try {
-      const res = await fetch('/api/share', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          donorName: donorName.trim(),
-          donorEmail: donorEmail.trim(),
-          orgEmail: orgEmail.trim(),
-          orgName: orgName.trim(),
-          selectedOfferings: selectedItems,
-          donorSummary,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to share');
-      }
-
-      setSent(true);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
-    } finally {
-      setSending(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 animate-fade-in">
-      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold text-navy-800">
-              {sent ? 'Shared!' : 'Share with your organization'}
-            </h3>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {sent ? (
-            <div className="text-center py-6">
-              <div className="w-16 h-16 rounded-full bg-brand-50 flex items-center justify-center mx-auto mb-4">
-                <CheckCircle2 className="w-8 h-8 text-brand-600" />
-              </div>
-              <h4 className="text-lg font-semibold text-navy-800 mb-2">
-                Your offerings have been sent!
-              </h4>
-              <p className="text-navy-600 text-sm mb-6">
-                {orgName || 'The organization'} will receive your{' '}
-                {selectedItems.length} offering
-                {selectedItems.length > 1 ? 's' : ''} and can reach out to
-                coordinate.
-              </p>
-              <button
-                onClick={onClose}
-                className="px-6 py-2.5 rounded-xl bg-brand-600 text-white font-medium hover:bg-brand-700 transition-colors"
-              >
-                Done
-              </button>
-            </div>
-          ) : (
-            <>
-              <p className="text-navy-600 text-sm mb-5">
-                We&apos;ll send{' '}
-                <span className="font-semibold">
-                  {selectedItems.length} offering
-                  {selectedItems.length > 1 ? 's' : ''}
-                </span>{' '}
-                to the organization so they can follow up with you.
-              </p>
-
-              <div className="space-y-3 mb-5">
-                <div className="bg-cream-50 rounded-xl p-3 space-y-1">
-                  {selectedItems.map((item, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-2 text-sm text-navy-700"
-                    >
-                      <CheckCircle2 className="w-4 h-4 text-brand-500 flex-shrink-0" />
-                      <span className="font-medium">{item.title}</span>
-                      {item.isHiddenGem && (
-                        <Gem className="w-3 h-3 text-amber-500 flex-shrink-0" />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-navy-700 mb-1">
-                    Your name
-                  </label>
-                  <input
-                    type="text"
-                    value={donorName}
-                    onChange={(e) => setDonorName(e.target.value)}
-                    placeholder="Jane Smith"
-                    className="w-full rounded-xl border border-brand-100 p-3 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-navy-700 mb-1">
-                    Your email
-                  </label>
-                  <input
-                    type="email"
-                    value={donorEmail}
-                    onChange={(e) => setDonorEmail(e.target.value)}
-                    placeholder="jane@example.com"
-                    className="w-full rounded-xl border border-brand-100 p-3 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-navy-700 mb-1">
-                    Organization name{' '}
-                    <span className="text-navy-600 font-normal">(optional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={orgName}
-                    onChange={(e) => setOrgName(e.target.value)}
-                    placeholder="e.g. Lincoln Elementary PTA"
-                    className="w-full rounded-xl border border-brand-100 p-3 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-navy-700 mb-1">
-                    Organization&apos;s email
-                  </label>
-                  <input
-                    type="email"
-                    value={orgEmail}
-                    onChange={(e) => setOrgEmail(e.target.value)}
-                    placeholder="auction@lincolnpta.org"
-                    className="w-full rounded-xl border border-brand-100 p-3 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
-                  />
-                </div>
-              </div>
-
-              {error && (
-                <p className="text-sm text-red-600 mt-3">{error}</p>
-              )}
-
-              <button
-                onClick={handleShare}
-                disabled={sending}
-                className="mt-5 w-full py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-              >
-                {sending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    Share My Offerings
-                  </>
-                )}
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ─── Main App ─── */
 export default function Home() {
-  const [step, setStep] = useState<'select' | 'input' | 'results'>('select');
-  const [method, setMethod] = useState<InputMethod | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [allSuggestions, setAllSuggestions] = useState<AuctionSuggestion[]>([]);
-  const [donorSummary, setDonorSummary] = useState('');
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const [showShareModal, setShowShareModal] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    adminEmail: '',
+    logoUrl: '',
+    message: '',
+    brandColor: '#6b8b74',
+  })
 
-  // Free text
-  const [freetext, setFreetext] = useState('');
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<{
+    slug: string
+    donorLink: string
+    adminLink: string
+    accessToken: string
+  } | null>(null)
 
-  // Guided
-  const [donorType, setDonorType] = useState<DonorType>('individual');
-  const [guided, setGuided] = useState<GuidedAnswers>({
-    donorType: 'individual',
-  });
+  const [copiedField, setCopiedField] = useState<string | null>(null)
 
-  // Social
-  const [socialText, setSocialText] = useState('');
+  const formRef = useRef<HTMLDivElement>(null)
+  const formInView = useInView(formRef, { once: true, margin: '-100px' })
 
-  // Optional nonprofit context
-  const [nonprofitContext, setNonprofitContext] = useState('');
-
-  const resultsRef = useRef<HTMLDivElement>(null);
-
-  const selectMethod = (m: InputMethod) => {
-    setMethod(m);
-    setStep('input');
-  };
-
-  const updateGuided = (key: keyof GuidedAnswers, value: string) => {
-    setGuided((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const buildInput = (): DonorInput => {
-    const input: DonorInput = {
-      method: method!,
-      nonprofitContext: nonprofitContext || undefined,
-    };
-
-    switch (method) {
-      case 'freetext':
-        input.freetext = freetext;
-        break;
-      case 'guided':
-        input.guided = { ...guided, donorType };
-        break;
-      case 'social':
-        input.socialText = socialText;
-        break;
-    }
-
-    return input;
-  };
-
-  const handleSubmit = async (keepBrainstorming = false) => {
-    if (keepBrainstorming) {
-      setLoadingMore(true);
-    } else {
-      setLoading(true);
-    }
-    setError(null);
-
-    const input = buildInput();
-
-    // If brainstorming more, pass existing titles so AI doesn't repeat
-    if (keepBrainstorming && allSuggestions.length > 0) {
-      input.previousSuggestions = allSuggestions.map((s) => s.title);
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
 
     try {
-      const res = await fetch('/api/suggest', {
+      const res = await fetch('/api/org/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(input),
-      });
+        body: JSON.stringify(formData),
+      })
+
+      const data = await res.json()
 
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || 'Something went wrong');
+        throw new Error(data.error || 'Registration failed')
       }
 
-      const data: SuggestionsResponse = await res.json();
+      const orgSlug = data.org.slug
+      const token = data.org.accessToken
+      const donorLink = `https://whatcouldioffer.com/org/${orgSlug}`
+      const adminLink = `https://whatcouldioffer.com/admin/${token}`
 
-      if (keepBrainstorming) {
-        // Append new suggestions
-        setAllSuggestions((prev) => [...prev, ...data.suggestions]);
-      } else {
-        setAllSuggestions(data.suggestions);
-        setDonorSummary(data.donorSummary);
-        setSelectedIds(new Set());
-      }
-      setStep('results');
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setSuccess({
+        slug: orgSlug,
+        donorLink,
+        adminLink,
+        accessToken: token,
+      })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const toggleSelected = (index: number) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(index)) {
-        next.delete(index);
-      } else {
-        next.add(index);
-      }
-      return next;
-    });
-  };
+  const copyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text)
+    setCopiedField(field)
+    setTimeout(() => setCopiedField(null), 2000)
+  }
 
-  const startOver = () => {
-    setStep('select');
-    setMethod(null);
-    setAllSuggestions([]);
-    setDonorSummary('');
-    setError(null);
-    setFreetext('');
-    setGuided({ donorType: 'individual' });
-    setSocialText('');
-    setNonprofitContext('');
-    setSelectedIds(new Set());
-  };
+  const scrollToForm = () => {
+    formRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
-  const hiddenGemsCount = allSuggestions.filter((s) => s.isHiddenGem).length;
-  const selectedItems = Array.from(selectedIds).map((i) => allSuggestions[i]);
+  if (success) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-brand-50 via-cream to-white flex items-center justify-center px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-2xl"
+        >
+          <div className="bg-white rounded-2xl shadow-2xl border border-brand-100 overflow-hidden">
+            {/* Success Header */}
+            <div className="bg-gradient-to-r from-brand-500 to-brand-600 px-8 py-12 text-center">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 200,
+                  damping: 15,
+                  delay: 0.2,
+                }}
+              >
+                <CheckCircle2 className="w-16 h-16 text-white mx-auto mb-4" />
+              </motion.div>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                Organization Created!
+              </h1>
+              <p className="text-brand-50">
+                You're all set to start discovering donor gifts
+              </p>
+            </div>
+
+            {/* Success Content */}
+            <div className="p-8 space-y-8">
+              {/* Links Section */}
+              <motion.div
+                variants={staggerContainer}
+                initial="initial"
+                animate="animate"
+                className="space-y-6"
+              >
+                {/* Donor Link */}
+                <motion.div variants={fadeInUp} className="space-y-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Share2 className="w-5 h-5 text-brand-600" />
+                    <label className="font-semibold text-gray-900">
+                      Share with Donors
+                    </label>
+                  </div>
+                  <div className="flex gap-2 bg-gray-50 rounded-lg p-3 border border-gray-200">
+                    <input
+                      type="text"
+                      value={success.donorLink}
+                      readOnly
+                      className="flex-1 bg-transparent text-sm text-gray-700 font-mono outline-none"
+                    />
+                    <button
+                      onClick={() =>
+                        copyToClipboard(success.donorLink, 'donor')
+                      }
+                      className="px-3 py-1 rounded bg-brand-100 hover:bg-brand-200 text-brand-700 transition-colors flex items-center gap-1 whitespace-nowrap"
+                    >
+                      {copiedField === 'donor' ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          Copy
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Share this link with your donors to get started
+                  </p>
+                </motion.div>
+
+                {/* Admin Dashboard Link */}
+                <motion.div variants={fadeInUp} className="space-y-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Settings className="w-5 h-5 text-brand-600" />
+                    <label className="font-semibold text-gray-900">
+                      Your Admin Dashboard
+                    </label>
+                  </div>
+                  <div className="flex gap-2 bg-gray-50 rounded-lg p-3 border border-gray-200">
+                    <input
+                      type="text"
+                      value={success.adminLink}
+                      readOnly
+                      className="flex-1 bg-transparent text-sm text-gray-700 font-mono outline-none"
+                    />
+                    <button
+                      onClick={() =>
+                        copyToClipboard(success.adminLink, 'admin')
+                      }
+                      className="px-3 py-1 rounded bg-brand-100 hover:bg-brand-200 text-brand-700 transition-colors flex items-center gap-1 whitespace-nowrap"
+                    >
+                      {copiedField === 'admin' ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          Copy
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+
+                {/* Warning */}
+                <motion.div
+                  variants={fadeInUp}
+                  className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3"
+                >
+                  <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-amber-900 mb-1">
+                      Save your admin link
+                    </p>
+                    <p className="text-sm text-amber-800">
+                      It's your only way to access your dashboard. Bookmark it or
+                      save it in a secure location.
+                    </p>
+                  </div>
+                </motion.div>
+
+                {/* CTA Buttons */}
+                <motion.div
+                  variants={fadeInUp}
+                  className="flex gap-3 pt-4 flex-col sm:flex-row"
+                >
+                  <button
+                    onClick={() =>
+                      copyToClipboard(success.donorLink, 'donor-cta')
+                    }
+                    className="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+                  >
+                    <Heart className="w-5 h-5" />
+                    Share Donor Link
+                  </button>
+                  <button
+                    onClick={() =>
+                      window.open(success.adminLink, '_blank')
+                    }
+                    className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-3 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+                  >
+                    <Settings className="w-5 h-5" />
+                    Go to Dashboard
+                  </button>
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Footer Note */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="text-center text-gray-600 text-sm mt-6"
+          >
+            Questions? Email us at support@whatcouldioffer.com
+          </motion.p>
+        </motion.div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-cream-50">
-      {/* Header */}
-      <header className="bg-cream-100 border-b border-brand-100">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-brand-500 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+    <div className="min-h-screen bg-gradient-to-b from-navy-900 via-navy-800 to-brand-900 text-gray-900">
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden">
+        {/* Animated background elements */}
+        <motion.div
+          animate={{ y: [0, 30, 0] }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+          className="absolute -top-40 -right-40 w-80 h-80 bg-brand-500 rounded-full opacity-10 blur-3xl"
+        />
+        <motion.div
+          animate={{ y: [0, -30, 0] }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+          className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full opacity-10 blur-3xl"
+        />
+
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="inline-block mb-6"
+          >
+            <div className="bg-brand-500/20 border border-brand-500/40 rounded-full px-4 py-2 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-brand-300" />
+              <span className="text-brand-100 text-sm font-medium">
+                AI-Powered Discovery
+              </span>
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-navy-800 leading-tight tracking-tight">
-                What Could I Offer?
-              </h1>
-              <p className="text-[11px] text-brand-600 leading-tight">
-                by BetterWorld
-              </p>
-            </div>
-          </div>
-          {step !== 'select' && (
+          </motion.div>
+
+          {/* Main Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
+          >
+            What Could I{' '}
+            <span className="bg-gradient-to-r from-brand-300 to-blue-300 bg-clip-text text-transparent">
+              Offer?
+            </span>
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed"
+          >
+            AI-powered auction item discovery that helps nonprofits unlock the hidden
+            generosity of their donors. Watch as your community discovers what they can
+            offer.
+          </motion.p>
+
+          {/* Stats */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-8 mb-12 max-w-xl mx-auto"
+          >
+            {[
+              { label: 'Nonprofits Helped', value: '200+' },
+              { label: 'Auction Items Found', value: '5K+' },
+              { label: 'Funds Raised', value: '$2.5M+' },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4 + i * 0.1 }}
+                className="text-center"
+              >
+                <p className="text-2xl sm:text-3xl font-bold text-brand-300 mb-1">
+                  {stat.value}
+                </p>
+                <p className="text-xs sm:text-sm text-gray-400">{stat.label}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* CTA Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
             <button
-              onClick={startOver}
-              className="text-sm text-navy-600 hover:text-navy-800 flex items-center gap-1.5 transition-colors"
+              onClick={scrollToForm}
+              className="group relative inline-flex items-center gap-2 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold py-4 px-8 rounded-xl transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-2xl"
             >
-              <RotateCcw className="w-4 h-4" />
-              Start over
+              Set Up Your Organization
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
-          )}
+          </motion.div>
         </div>
-      </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-8 pb-20">
-        {/* ─── STEP 1: Select Input Method ─── */}
-        {step === 'select' && (
-          <div className="animate-fade-in">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl sm:text-4xl font-bold text-navy-800 mb-3 tracking-tight">
-                You have more to offer than you think
-              </h2>
-              <p className="text-lg text-navy-600 max-w-xl mx-auto leading-relaxed">
-                Tell us a little about yourself and we&apos;ll uncover creative,
-                high-value offerings unique to you — things you never knew
-                could raise serious money at auction.
-              </p>
-            </div>
+        {/* Scroll indicator */}
+        <motion.div
+          animate={{ y: [0, 12, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        >
+          <ChevronDown className="w-6 h-6 text-brand-400" />
+        </motion.div>
+      </section>
 
-            <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
-              <button
-                onClick={() => selectMethod('freetext')}
-                className="group text-left p-6 bg-white rounded-2xl border border-brand-100 hover:border-brand-300 hover:shadow-md transition-all duration-200"
+      {/* How It Works Section */}
+      <section className="py-20 px-4 bg-gradient-to-b from-brand-900 to-cream">
+        <div className="max-w-6xl mx-auto">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+              How It Works
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Get your nonprofit up and running in three simple steps
+            </p>
+          </motion.div>
+
+          {/* Steps Grid */}
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            className="grid md:grid-cols-3 gap-8"
+          >
+            {[
+              {
+                step: 1,
+                icon: Settings,
+                title: 'Set Up Your Organization',
+                description:
+                  'Tell us about your nonprofit, customize your branding, and set your mission message for donors.',
+              },
+              {
+                step: 2,
+                icon: Share2,
+                title: 'Share Your Unique Link',
+                description:
+                  'Invite your donors with your custom link. Each organization gets its own branded experience.',
+              },
+              {
+                step: 3,
+                icon: Heart,
+                title: 'Discover Donor Gifts',
+                description:
+                  'Watch as donors discover and share what they can offer. Build your auction items easily.',
+              },
+            ].map((item, idx) => (
+              <motion.div
+                key={idx}
+                variants={fadeInUp}
+                className="relative group"
               >
-                <div className="w-12 h-12 rounded-xl bg-cream-100 group-hover:bg-brand-50 flex items-center justify-center mb-4 transition-colors">
-                  <MessageSquareText className="w-6 h-6 text-brand-600" />
-                </div>
-                <h3 className="font-semibold text-navy-800 mb-1">
-                  In Your Own Words
-                </h3>
-                <p className="text-sm text-navy-600">
-                  Describe what you do, what you love, and what makes you you
-                </p>
-              </button>
+                {/* Card Background */}
+                <div className="absolute inset-0 bg-gradient-to-br from-brand-100 to-brand-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-              <button
-                onClick={() => selectMethod('guided')}
-                className="group text-left p-6 bg-white rounded-2xl border border-brand-100 hover:border-brand-300 hover:shadow-md transition-all duration-200"
-              >
-                <div className="w-12 h-12 rounded-xl bg-cream-100 group-hover:bg-brand-50 flex items-center justify-center mb-4 transition-colors">
-                  <ClipboardList className="w-6 h-6 text-brand-600" />
-                </div>
-                <h3 className="font-semibold text-navy-800 mb-1">
-                  Quick Questions
-                </h3>
-                <p className="text-sm text-navy-600">
-                  Answer a few prompts and we&apos;ll surface your hidden offerings
-                </p>
-              </button>
+                {/* Content */}
+                <div className="relative bg-white rounded-2xl p-8 border-2 border-brand-100 group-hover:border-brand-300 transition-colors duration-300 h-full flex flex-col">
+                  {/* Step Badge */}
+                  <div className="w-12 h-12 bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl flex items-center justify-center mb-6 transform group-hover:scale-110 transition-transform">
+                    <span className="text-white font-bold text-lg">{item.step}</span>
+                  </div>
 
-              <button
-                onClick={() => selectMethod('social')}
-                className="group text-left p-6 bg-white rounded-2xl border border-brand-100 hover:border-brand-300 hover:shadow-md transition-all duration-200"
-              >
-                <div className="w-12 h-12 rounded-xl bg-cream-100 group-hover:bg-brand-50 flex items-center justify-center mb-4 transition-colors">
-                  <Linkedin className="w-6 h-6 text-brand-600" />
-                </div>
-                <h3 className="font-semibold text-navy-800 mb-1">
-                  Use Your Profile
-                </h3>
-                <p className="text-sm text-navy-600">
-                  Paste your LinkedIn or bio and we&apos;ll do the thinking
-                </p>
-              </button>
-            </div>
+                  {/* Icon */}
+                  <div className="mb-6 text-brand-600 transform group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300">
+                    <item.icon className="w-12 h-12" />
+                  </div>
 
-            {/* Social proof / encouragement */}
-            <div className="mt-12 text-center">
-              <p className="text-sm text-navy-600 mb-4 font-medium">
-                People are always surprised by what they can offer
-              </p>
-              <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
-                {[
-                  '"I had no idea my backyard could be worth $2,000"',
-                  '"A cooking lesson? That brought in $800!"',
-                  '"My parking spot raised $600 for the school"',
-                ].map((quote, i) => (
-                  <span
-                    key={i}
-                    className="text-xs text-navy-600 bg-cream-100 px-3 py-1.5 rounded-full"
-                  >
-                    {quote}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+                  {/* Text */}
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">
+                    {item.title}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed flex-grow">
+                    {item.description}
+                  </p>
 
-        {/* ─── STEP 2: Input Form ─── */}
-        {step === 'input' && !loading && (
-          <div className="max-w-2xl mx-auto animate-fade-in">
-            <button
-              onClick={() => setStep('select')}
-              className="text-sm text-navy-600 hover:text-navy-800 flex items-center gap-1 mb-6 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" /> Back
-            </button>
-
-            {/* Free Text */}
-            {method === 'freetext' && (
-              <div>
-                <h2 className="text-2xl font-bold text-navy-800 mb-2">
-                  What makes you, you?
-                </h2>
-                <p className="text-navy-600 mb-6">
-                  Share anything — your profession, hobbies, skills, property,
-                  business — the more we know, the more surprising your offerings
-                  will be.
-                </p>
-                <textarea
-                  value={freetext}
-                  onChange={(e) => setFreetext(e.target.value)}
-                  placeholder={"Example: I'm a dentist who loves sailing. I have a vacation condo in Hilton Head and I'm also a pretty good amateur photographer. My wife runs a catering business..."}
-                  rows={6}
-                  className="w-full rounded-xl border border-brand-100 p-4 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent resize-none text-sm"
-                />
-              </div>
-            )}
-
-            {/* Guided */}
-            {method === 'guided' && (
-              <div>
-                <h2 className="text-2xl font-bold text-navy-800 mb-2">
-                  Let&apos;s find what you could offer
-                </h2>
-                <p className="text-navy-600 mb-6">
-                  A few quick details and we&apos;ll discover offerings you
-                  didn&apos;t know you had.
-                </p>
-
-                {/* Donor type toggle */}
-                <div className="flex gap-2 mb-6">
-                  <button
-                    onClick={() => setDonorType('individual')}
-                    className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
-                      donorType === 'individual'
-                        ? 'bg-brand-600 text-white shadow-md'
-                        : 'bg-cream-100 text-navy-600 hover:bg-cream-200'
-                    }`}
-                  >
-                    Individual
-                  </button>
-                  <button
-                    onClick={() => setDonorType('business')}
-                    className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
-                      donorType === 'business'
-                        ? 'bg-brand-600 text-white shadow-md'
-                        : 'bg-cream-100 text-navy-600 hover:bg-cream-200'
-                    }`}
-                  >
-                    Business
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  {donorType === 'individual' ? (
-                    <>
-                      <InputField
-                        label="What do you do for work?"
-                        placeholder="e.g. Dentist, Software Engineer, Real Estate Agent, Teacher..."
-                        value={guided.profession || ''}
-                        onChange={(v) => updateGuided('profession', v)}
-                      />
-                      <InputField
-                        label="Hobbies & interests"
-                        placeholder="e.g. Sailing, photography, cooking, golf, woodworking..."
-                        value={guided.hobbies || ''}
-                        onChange={(v) => updateGuided('hobbies', v)}
-                      />
-                      <InputField
-                        label="Special skills or expertise"
-                        placeholder="e.g. Wine knowledge, piano, yoga instruction, public speaking..."
-                        value={guided.skills || ''}
-                        onChange={(v) => updateGuided('skills', v)}
-                      />
-                      <InputField
-                        label="Assets or access (optional)"
-                        placeholder="e.g. Beach house, boat, season tickets, country club membership..."
-                        value={guided.assets || ''}
-                        onChange={(v) => updateGuided('assets', v)}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <InputField
-                        label="Business name"
-                        placeholder="e.g. Sunrise Coffee Roasters"
-                        value={guided.businessName || ''}
-                        onChange={(v) => updateGuided('businessName', v)}
-                      />
-                      <InputField
-                        label="Industry"
-                        placeholder="e.g. Restaurant, Law Firm, Fitness Studio, Tech Company..."
-                        value={guided.industry || ''}
-                        onChange={(v) => updateGuided('industry', v)}
-                      />
-                      <InputField
-                        label="What type of business?"
-                        placeholder="e.g. Coffee shop with roasting facility, boutique fitness studio..."
-                        value={guided.businessType || ''}
-                        onChange={(v) => updateGuided('businessType', v)}
-                      />
-                      <InputField
-                        label="Special services you offer"
-                        placeholder="e.g. Private dining, custom cakes, personal training, tax prep..."
-                        value={guided.specialServices || ''}
-                        onChange={(v) => updateGuided('specialServices', v)}
-                      />
-                      <InputField
-                        label="Physical space / venue (optional)"
-                        placeholder="e.g. Event room for 50, outdoor patio, private studio..."
-                        value={guided.physicalSpace || ''}
-                        onChange={(v) => updateGuided('physicalSpace', v)}
-                      />
-                      <InputField
-                        label="Team expertise (optional)"
-                        placeholder="e.g. Certified sommelier on staff, master barber, licensed therapist..."
-                        value={guided.teamExpertise || ''}
-                        onChange={(v) => updateGuided('teamExpertise', v)}
-                      />
-                      <InputField
-                        label="Products or inventory (optional)"
-                        placeholder="e.g. Craft beer selection, organic skincare line, handmade furniture..."
-                        value={guided.inventoryOrProducts || ''}
-                        onChange={(v) =>
-                          updateGuided('inventoryOrProducts', v)
-                        }
-                      />
-                    </>
+                  {/* Arrow */}
+                  {idx < 2 && (
+                    <motion.div
+                      animate={{ x: [0, 8, 0] }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                      }}
+                      className="hidden md:block absolute -right-4 top-1/2 -translate-y-1/2"
+                    >
+                      <ArrowRight className="w-6 h-6 text-brand-400" />
+                    </motion.div>
                   )}
                 </div>
-              </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Registration Form Section */}
+      <section
+        ref={formRef}
+        className="py-20 px-4 bg-cream min-h-screen flex items-center"
+      >
+        <div className="w-full max-w-2xl mx-auto">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={formInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+              Create Your Organization
+            </h2>
+            <p className="text-lg text-gray-600">
+              Get started in less than 2 minutes
+            </p>
+          </motion.div>
+
+          {/* Form Card */}
+          <motion.form
+            onSubmit={handleSubmit}
+            initial={{ opacity: 0, y: 20 }}
+            animate={formInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6 }}
+            className="bg-white rounded-2xl shadow-xl border-2 border-brand-100 p-8 space-y-6"
+          >
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-50 border-2 border-red-200 rounded-lg p-4 flex gap-3"
+              >
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-800">{error}</p>
+              </motion.div>
             )}
 
-            {/* Social / LinkedIn */}
-            {method === 'social' && (
-              <div>
-                <h2 className="text-2xl font-bold text-navy-800 mb-2">
-                  Drop in your profile
-                </h2>
-                <p className="text-navy-600 mb-6">
-                  Paste your LinkedIn &ldquo;About,&rdquo; website bio, or any
-                  profile text — we&apos;ll find the offerings hidden in your
-                  background.
-                </p>
-                <textarea
-                  value={socialText}
-                  onChange={(e) => setSocialText(e.target.value)}
-                  placeholder={"Paste your LinkedIn About section, Instagram bio, website About page, or just your profile URL here...\n\nTip: On LinkedIn, go to your profile \u2192 click your About section \u2192 copy the text"}
-                  rows={8}
-                  className="w-full rounded-xl border border-brand-100 p-4 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent resize-none text-sm"
-                />
-              </div>
-            )}
-
-            {/* Nonprofit context (all methods) */}
-            <div className="mt-6 pt-6 border-t border-brand-100">
-              <label className="block text-sm font-medium text-navy-700 mb-1.5">
-                What&apos;s the event?{' '}
-                <span className="text-navy-600 font-normal">(optional)</span>
+            {/* Organization Name */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={formInView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Organization Name *
               </label>
               <input
                 type="text"
-                value={nonprofitContext}
-                onChange={(e) => setNonprofitContext(e.target.value)}
-                placeholder="e.g. School gala, animal shelter fundraiser, community arts program..."
-                className="w-full rounded-xl border border-brand-100 p-3 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                placeholder="Your nonprofit's name"
+                required
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200 transition-all placeholder-gray-400"
               />
-            </div>
+            </motion.div>
 
-            {error && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
-                {error}
-              </div>
-            )}
-
-            <button
-              onClick={() => handleSubmit(false)}
-              disabled={
-                loading ||
-                (method === 'freetext' && !freetext.trim()) ||
-                (method === 'social' && !socialText.trim()) ||
-                (method === 'guided' &&
-                  donorType === 'individual' &&
-                  !guided.profession) ||
-                (method === 'guided' &&
-                  donorType === 'business' &&
-                  !guided.businessName)
-              }
-              className="mt-6 w-full py-3.5 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
+            {/* Admin Email */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={formInView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ delay: 0.15 }}
             >
-              <Sparkles className="w-5 h-5" />
-              Show Me What I Could Offer
-              <ArrowRight className="w-5 h-5" />
-            </button>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Admin Email *
+              </label>
+              <input
+                type="email"
+                value={formData.adminEmail}
+                onChange={(e) =>
+                  setFormData({ ...formData, adminEmail: e.target.value })
+                }
+                placeholder="your@email.com"
+                required
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200 transition-all placeholder-gray-400"
+              />
+            </motion.div>
+
+            {/* Logo URL */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={formInView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Logo URL <span className="text-gray-500 font-normal">(optional)</span>
+              </label>
+              <input
+                type="url"
+                value={formData.logoUrl}
+                onChange={(e) =>
+                  setFormData({ ...formData, logoUrl: e.target.value })
+                }
+                placeholder="https://example.com/logo.png"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200 transition-all placeholder-gray-400"
+              />
+            </motion.div>
+
+            {/* Brand Color Picker */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={formInView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ delay: 0.25 }}
+            >
+              <label className="block text-sm font-semibold text-gray-900 mb-3">
+                Brand Color
+              </label>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                {BRAND_COLORS.map((color) => (
+                  <motion.button
+                    key={color.value}
+                    type="button"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() =>
+                      setFormData({ ...formData, brandColor: color.value })
+                    }
+                    className={`h-12 rounded-lg transition-all relative group cursor-pointer ${
+                      color.tw
+                    } ${
+                      formData.brandColor === color.value
+                        ? 'ring-2 ring-offset-2 ring-gray-900 shadow-lg'
+                        : 'shadow-md hover:shadow-lg'
+                    }`}
+                    title={color.name}
+                  >
+                    {formData.brandColor === color.value && (
+                      <Check className="w-5 h-5 text-white absolute inset-0 m-auto" />
+                    )}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Custom Message */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={formInView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Message to Donors{' '}
+                <span className="text-gray-500 font-normal">(optional)</span>
+              </label>
+              <textarea
+                value={formData.message}
+                onChange={(e) =>
+                  setFormData({ ...formData, message: e.target.value })
+                }
+                placeholder="We're raising funds for... Tell your donors what you're passionate about!"
+                rows={4}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200 transition-all resize-none placeholder-gray-400"
+              />
+            </motion.div>
+
+            {/* Submit Button */}
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={formInView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ delay: 0.35 }}
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 rounded-lg transition-all transform hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-lg"
+            >
+              {loading ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: 'linear',
+                    }}
+                  >
+                    <Clock className="w-5 h-5" />
+                  </motion.div>
+                  Setting up...
+                </>
+              ) : (
+                <>
+                  Create Organization
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
+            </motion.button>
+
+            <p className="text-center text-xs text-gray-500">
+              We'll send a confirmation email to your admin address
+            </p>
+          </motion.form>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-navy-900 text-gray-400 py-8 px-4 border-t border-navy-800">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm">
+            Made by nonprofits, for nonprofits. Powered by{' '}
+            <a
+              href="https://betterworld.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-400 hover:text-brand-300 font-semibold transition-colors"
+            >
+              BetterWorld
+            </a>
+          </p>
+          <div className="flex gap-6 text-sm">
+            <a
+              href="#"
+              className="hover:text-brand-400 transition-colors"
+            >
+              Privacy
+            </a>
+            <a
+              href="#"
+              className="hover:text-brand-400 transition-colors"
+            >
+              Terms
+            </a>
+            <a
+              href="#"
+              className="hover:text-brand-400 transition-colors"
+            >
+              Contact
+            </a>
           </div>
-        )}
-
-        {/* Loading */}
-        {loading && <LoadingSkeleton isMore={false} />}
-
-        {/* ─── STEP 3: Results ─── */}
-        {step === 'results' && !loading && (
-          <div className="animate-fade-in" ref={resultsRef}>
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-navy-800 mb-2 tracking-tight">
-                Here&apos;s what you could offer
-              </h2>
-              <p className="text-navy-600 max-w-lg mx-auto mb-4">
-                {donorSummary}
-              </p>
-              <div className="flex flex-wrap items-center justify-center gap-3">
-                {hiddenGemsCount > 0 && (
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-full">
-                    <Gem className="w-4 h-4 text-amber-600" />
-                    <span className="text-sm font-medium text-amber-800">
-                      {hiddenGemsCount} Hidden Gem
-                      {hiddenGemsCount > 1 ? 's' : ''} — costs you little,
-                      worth a lot to bidders
-                    </span>
-                  </div>
-                )}
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-50 border border-brand-200 rounded-full">
-                  <span className="text-sm font-medium text-brand-700">
-                    {allSuggestions.length} offering
-                    {allSuggestions.length > 1 ? 's' : ''} discovered
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Instruction for selecting */}
-            <div className="max-w-3xl mx-auto mb-4">
-              <p className="text-sm text-navy-600 text-center">
-                Tap the circle on any offerings you&apos;d like to share with
-                your organization, then hit{' '}
-                <span className="font-semibold">Share with Org</span> below.
-              </p>
-            </div>
-
-            <div className="max-w-3xl mx-auto space-y-4">
-              {allSuggestions.map((item, i) => (
-                <SuggestionCard
-                  key={`${i}-${item.title}`}
-                  item={item}
-                  index={i < 8 ? i : 0}
-                  selectable={true}
-                  selected={selectedIds.has(i)}
-                  onToggle={() => toggleSelected(i)}
-                />
-              ))}
-            </div>
-
-            {/* Keep Brainstorming / Loading More */}
-            {loadingMore && (
-              <div className="max-w-3xl mx-auto mt-6">
-                <div className="flex items-center justify-center gap-3 py-8">
-                  <Loader2 className="w-5 h-5 text-brand-500 animate-spin" />
-                  <span className="text-navy-600 font-medium">
-                    Brainstorming more ideas...
-                  </span>
-                </div>
-              </div>
-            )}
-
-            <div className="max-w-3xl mx-auto mt-8">
-              {/* Primary actions */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                {/* Share with Org — primary CTA */}
-                <button
-                  onClick={() => setShowShareModal(true)}
-                  disabled={selectedIds.size === 0}
-                  className={`flex-1 px-6 py-3.5 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${
-                    selectedIds.size > 0
-                      ? 'bg-brand-600 text-white hover:bg-brand-700 shadow-sm hover:shadow-md'
-                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  <Send className="w-5 h-5" />
-                  {selectedIds.size > 0
-                    ? `Share ${selectedIds.size} Offering${selectedIds.size > 1 ? 's' : ''} with Org`
-                    : 'Select offerings to share'}
-                </button>
-
-                {/* Keep Brainstorming */}
-                <button
-                  onClick={() => handleSubmit(true)}
-                  disabled={loadingMore}
-                  className="flex-1 px-6 py-3.5 rounded-xl bg-white border border-brand-200 text-navy-700 font-semibold hover:bg-cream-50 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-                >
-                  <Lightbulb className="w-5 h-5" />
-                  Keep Brainstorming
-                </button>
-              </div>
-
-              {/* Secondary actions */}
-              <div className="flex justify-center mt-4">
-                <button
-                  onClick={startOver}
-                  className="text-sm text-navy-600 hover:text-navy-800 flex items-center gap-1.5 transition-colors"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                  Start Over
-                </button>
-              </div>
-
-              <p className="mt-6 text-xs text-navy-600 text-center">
-                Built by{' '}
-                <a
-                  href="https://betterworld.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-brand-500 hover:text-brand-600"
-                >
-                  BetterWorld
-                </a>
-              </p>
-            </div>
-          </div>
-        )}
-      </main>
-
-      {/* Share Modal */}
-      {showShareModal && (
-        <ShareModal
-          selectedItems={selectedItems}
-          donorSummary={donorSummary}
-          onClose={() => setShowShareModal(false)}
-        />
-      )}
+        </div>
+      </footer>
     </div>
-  );
-}
-
-/* ─── Reusable input field ─── */
-function InputField({
-  label,
-  placeholder,
-  value,
-  onChange,
-}: {
-  label: string;
-  placeholder: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-navy-700 mb-1.5">
-        {label}
-      </label>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full rounded-xl border border-brand-100 p-3 text-navy-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent text-sm"
-      />
-    </div>
-  );
+  )
 }
