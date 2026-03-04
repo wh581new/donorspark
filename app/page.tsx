@@ -183,7 +183,7 @@ function BeforeAfterCard({ example, index }: { example: typeof BEFORE_AFTER_EXAM
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">{example.after.emoji}</span>
               <span className="text-xs font-semibold text-emerald-300 uppercase tracking-wider bg-emerald-500/20 px-2 py-0.5 rounded-full">
-                With What Could I Offer
+                After
               </span>
             </div>
             <p className="text-white text-xl font-bold tracking-tight">{example.after.title}</p>
@@ -216,7 +216,7 @@ function BeforeAfterCard({ example, index }: { example: typeof BEFORE_AFTER_EXAM
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">{example.before.emoji}</span>
                 <span className="text-xs font-semibold text-gray-300 uppercase tracking-wider bg-gray-500/30 px-2 py-0.5 rounded-full">
-                  Without What Could I Offer
+                  Before
                 </span>
               </div>
               <p className="text-white text-xl font-bold tracking-tight">{example.before.title}</p>
@@ -735,7 +735,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center text-gray-500 text-lg max-w-2xl mx-auto mb-16"
           >
-            A local coffee shop usually donates a $25 gift card. With What Could I Offer, AI helps them discover offerings that raise <span className="text-navy-900 font-semibold">8&ndash;24x more</span> — at almost no extra cost. Drag the slider to compare.
+            A local coffee shop usually donates a $25 gift card. With AI, we help them discover offerings that raise <span className="text-navy-900 font-semibold">8&ndash;24x more</span> — at almost no extra cost. Drag the slider to compare.
           </motion.p>
 
           <div className="grid md:grid-cols-3 gap-8">
