@@ -330,17 +330,18 @@ function LoadingState({ isMore }: { isMore: boolean }) {
   useEffect(() => {
     if (isMore) return;
     const start = Date.now();
-    const duration = 18000;
     const tick = () => {
       const elapsed = Date.now() - start;
-      const pct = Math.min(95, (elapsed / duration) * 100);
+      // Asymptotic curve: approaches 95% but always keeps moving
+      // At 5s → ~55%, 10s → ~75%, 20s → ~88%, 40s → ~93%
+      const pct = 95 * (1 - Math.exp(-elapsed / 12000));
       setProgress(pct);
-      // Advance step based on progress
       const stepIndex = Math.min(LOADING_STEPS.length - 1, Math.floor((pct / 95) * LOADING_STEPS.length));
       setActiveStep(stepIndex);
-      if (pct < 95) requestAnimationFrame(tick);
+      requestAnimationFrame(tick);
     };
-    requestAnimationFrame(tick);
+    const raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, [isMore, LOADING_STEPS.length]);
 
   // Rotate fun facts
@@ -1017,12 +1018,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
   const selectedItems = Array.from(selectedIds).map(i => allSuggestions[i]);
   const hiddenGemsCount = allSuggestions.filter(s => s.isHiddenGem).length;
 
-  // Progress: form screens fill to ~85%, loading/AI phase shows 92%, results = 100%
-  const progressPercent = phase === 'results'
-    ? 100
-    : loading
-      ? 92
-      : Math.round((screen / TOTAL_SCREENS) * 85);
+  const progressPercent = phase === 'results' ? 100 : Math.round((screen / TOTAL_SCREENS) * 100);
 
   // ─── Loading org ───
   if (orgLoading) {
