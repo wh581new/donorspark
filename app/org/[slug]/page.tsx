@@ -1178,9 +1178,9 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-12"
                     >
                       {org.message ? (
-                        <>{org.message} Answer a few quick questions and we&apos;ll uncover creative auction item ideas you could offer that help raise more!</>
+                        <>{org.message} Answer a few quick questions and we&apos;ll show you creative auction item ideas you could offer that help raise more!</>
                       ) : (
-                        <>Help {org.name} plan an amazing auction — answer a few quick questions and we&apos;ll uncover creative auction item ideas you could offer that help raise more!</>
+                        <>Help {org.name} plan an amazing auction — answer a few quick questions and we&apos;ll show you creative auction item ideas you could offer that help raise more!</>
                       )}
                     </motion.p>
 
