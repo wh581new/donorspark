@@ -601,6 +601,11 @@ function ThankYouPage({ orgName, orgSlug, brandColor }: { orgName: string; orgSl
   const [copied, setCopied] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
 
+  // Scroll to top when thank you page mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => setShowConfetti(false), 4000);
     return () => clearTimeout(timer);
