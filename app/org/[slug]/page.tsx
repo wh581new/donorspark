@@ -1178,9 +1178,9 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-12"
                     >
                       {org.message ? (
-                        <>{org.message} Just answer a few quick questions — we&apos;ll handle the rest!</>
+                        <>{org.message} Just answer a few quick questions and we&apos;ll show you ideas!</>
                       ) : (
-                        <>Help {org.name} raise more at their next auction! Just answer a few quick questions — we&apos;ll handle the rest.</>
+                        <>Help {org.name} raise more at their next auction! Just answer a few quick questions and we&apos;ll show you ideas.</>
                       )}
                     </motion.p>
 
