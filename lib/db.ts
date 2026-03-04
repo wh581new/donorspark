@@ -1,17 +1,28 @@
 /**
- * Persistent KV database for WCIO.
- * Uses Vercel KV (Upstash Redis) for persistent storage.
- * Drop-in replacement for the old /tmp filesystem approach.
+ * Persistent Redis database for WCIO.
+ * Uses ioredis with REDIS_URL for persistent storage.
  */
 
-import { kv } from '@vercel/kv';
+import Redis from 'ioredis';
 import { v4 as uuid } from 'uuid';
 
-// KV keys
+let redisClient: Redis | null = null;
+
+function getRedis(): Redis {
+  if (!redisClient) {
+    const url = process.env.REDIS_URL;
+    if (!url) throw new Error('Missing REDIS_URL environment variable');
+    redisClient = new Redis(url, {
+      maxRetriesPerRequest: 3,
+      lazyConnect: true,
+      tls: process.env.REDIS_URL?.startsWith('rediss://') ? {} : undefined,
+    });
+  }
+  return redisClient;
+}
+
 const ORGS_KEY = 'wcio:orgs';
 const SUBMISSIONS_KEY = 'wcio:submissions';
-
-// --- Types ---
 
 export interface Org {
   id: string;
@@ -45,19 +56,18 @@ export interface Submission {
   createdAt: string;
 }
 
-// --- KV Helpers ---
-
 async function getList<T>(key: string): Promise<T[]> {
   try {
-    const data = await kv.get<T[]>(key);
-    return data || [];
+    const data = await getRedis().get(key);
+    if (!data) return [];
+    return JSON.parse(data) as T[];
   } catch {
     return [];
   }
 }
 
 async function setList<T>(key: string, data: T[]): Promise<void> {
-  await kv.set(key, data);
+  await getRedis().set(key, JSON.stringify(data));
 }
 
 function generateSlug(name: string): string {
@@ -74,8 +84,6 @@ function generateToken(): string {
   return uuid().replace(/-/g, '') + uuid().replace(/-/g, '');
 }
 
-// --- Org Operations ---
-
 export async function createOrg(data: {
   name: string;
   logoUrl?: string;
@@ -84,14 +92,12 @@ export async function createOrg(data: {
   brandColor?: string;
 }): Promise<Org> {
   const orgs = await getList<Org>(ORGS_KEY);
-
   let slug = generateSlug(data.name);
   let suffix = 1;
   while (orgs.some(o => o.slug === slug)) {
-    slug = generateSlug(data.name) + '-' + suffix;
+    slug = `${generateSlug(data.name)}-${suffix}`;
     suffix++;
   }
-
   const org: Org = {
     id: uuid(),
     slug,
@@ -103,7 +109,6 @@ export async function createOrg(data: {
     accessToken: generateToken(),
     createdAt: new Date().toISOString(),
   };
-
   orgs.push(org);
   await setList(ORGS_KEY, orgs);
   return org;
@@ -133,8 +138,6 @@ export async function updateOrg(id: string, updates: Partial<Pick<Org, 'name' | 
   return orgs[idx];
 }
 
-// --- Submission Operations ---
-
 export async function createSubmission(data: {
   orgId: string;
   donorName: string;
@@ -143,7 +146,6 @@ export async function createSubmission(data: {
   offerings: Submission['offerings'];
 }): Promise<Submission> {
   const submissions = await getList<Submission>(SUBMISSIONS_KEY);
-
   const submission: Submission = {
     id: uuid(),
     orgId: data.orgId,
@@ -154,7 +156,6 @@ export async function createSubmission(data: {
     status: 'new',
     createdAt: new Date().toISOString(),
   };
-
   submissions.push(submission);
   await setList(SUBMISSIONS_KEY, submissions);
   return submission;
@@ -181,8 +182,6 @@ export async function updateSubmissionStatus(id: string, status: Submission['sta
   return submissions[idx];
 }
 
-// --- Stats ---
-
 export async function getOrgStats(orgId: string): Promise<{
   totalSubmissions: number;
   totalOfferings: number;
@@ -192,25 +191,23 @@ export async function getOrgStats(orgId: string): Promise<{
   const submissions = await getSubmissionsByOrg(orgId);
   const totalOfferings = submissions.reduce((sum, s) => sum + s.offerings.length, 0);
   const newSubmissions = submissions.filter(s => s.status === 'new').length;
-
   let totalValue = 0;
   for (const sub of submissions) {
     for (const offering of sub.offerings) {
       const match = offering.estimatedValue.match(/\$?([\d,]+)/g);
       if (match && match.length >= 2) {
-        const low = parseInt(match[0].replace(/[\$,]/g, ''));
-        const high = parseInt(match[1].replace(/[\$,]/g, ''));
+        const low = parseInt(match[0].replace(/[$,]/g, ''));
+        const high = parseInt(match[1].replace(/[$,]/g, ''));
         totalValue += (low + high) / 2;
       } else if (match) {
-        totalValue += parseInt(match[0].replace(/[\$,]/g, ''));
+        totalValue += parseInt(match[0].replace(/[$,]/g, ''));
       }
     }
   }
-
   return {
     totalSubmissions: submissions.length,
     totalOfferings,
     newSubmissions,
-    estimatedValue: '$' + Math.round(totalValue).toLocaleString(),
+    estimatedValue: `$${Math.round(totalValue).toLocaleString()}`,
   };
 }
