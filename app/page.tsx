@@ -28,15 +28,16 @@ import {
 } from 'lucide-react'
 
 /* ────────────────────────────────────────────────
-   BetterWorld SVG Logo (matches brand book)
+   BetterWorld SVG Logo (official brand wordmark)
    ──────────────────────────────────────────────── */
-function BetterWorldLogo({ className = '', color = '#3d5566' }: { className?: string; color?: string }) {
+function BetterWorldLogo({ className = '' }: { className?: string; color?: string }) {
   return (
-    <svg className={className} viewBox="0 0 512 74" fill={color} xmlns="http://www.w3.org/2000/svg">
-      <text x="0" y="58" fontFamily="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif" fontSize="68" fontWeight="600" letterSpacing="-2">
-        betterworld
-      </text>
-    </svg>
+    <img
+      src="https://betterworld.org/assets/brand/wordmark-denim.svg"
+      alt="BetterWorld"
+      className={className}
+      draggable={false}
+    />
   )
 }
 
@@ -121,7 +122,7 @@ const BEFORE_AFTER_EXAMPLES = [
    Before/After Card Component
    ──────────────────────────────────────────────── */
 function BeforeAfterCard({ example, index }: { example: typeof BEFORE_AFTER_EXAMPLES[0]; index: number }) {
-  const [sliderPos, setSliderPos] = useState(50)
+  const [sliderPos, setSliderPos] = useState(95)
   const [isDragging, setIsDragging] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -210,7 +211,7 @@ function BeforeAfterCard({ example, index }: { example: typeof BEFORE_AFTER_EXAM
               style={{ filter: 'grayscale(30%) brightness(0.85)' }}
               draggable={false}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy-900/80 via-navy-900/30 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-6">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">{example.before.emoji}</span>
@@ -401,7 +402,7 @@ export default function Home() {
               >
                 <CheckCircle2 className="w-8 h-8 text-emerald-500" />
               </motion.div>
-              <h1 className="text-2xl font-semibold text-gray-900 mb-2 tracking-tight">
+              <h1 className="text-2xl font-semibold text-navy-900 mb-2 tracking-tight">
                 You&apos;re all set
               </h1>
               <p className="text-gray-500 text-[15px]">
@@ -465,14 +466,14 @@ export default function Home() {
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={() => copyToClipboard(success.donorLink, 'donor-cta')}
-                  className="flex-1 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 bg-navy-900 hover:bg-navy-800 text-white text-sm font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
                 >
                   <Share2 className="w-4 h-4" />
                   Copy Donor Link
                 </button>
                 <button
                   onClick={() => window.open(success.adminLink, '_blank')}
-                  className="flex-1 bg-white hover:bg-gray-50 text-gray-900 text-sm font-medium py-3 rounded-xl transition-colors border border-gray-200 flex items-center justify-center gap-2"
+                  className="flex-1 bg-white hover:bg-gray-50 text-navy-900 text-sm font-medium py-3 rounded-xl transition-colors border border-gray-200 flex items-center justify-center gap-2"
                 >
                   Open Dashboard
                   <ArrowUpRight className="w-4 h-4" />
@@ -502,7 +503,7 @@ export default function Home() {
             initial={{ opacity: 0, y: -40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -40 }}
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl text-sm font-medium flex items-center gap-2"
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] bg-navy-900 text-white px-6 py-3 rounded-full shadow-2xl text-sm font-medium flex items-center gap-2"
           >
             🎮 Achievement Unlocked: Secret Donor Mode!
           </motion.div>
@@ -513,10 +514,10 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100/80">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-navy-900 rounded-lg flex items-center justify-center">
               <Gift className="w-4 h-4 text-white" />
             </div>
-            <span className="font-semibold text-gray-900 text-[15px] tracking-tight">
+            <span className="font-semibold text-navy-900 text-[15px] tracking-tight">
               What Could I Offer?
             </span>
           </div>
@@ -527,7 +528,7 @@ export default function Home() {
             </a>
             <button
               onClick={scrollToForm}
-              className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium px-5 py-2 rounded-full transition-colors"
+              className="bg-navy-900 hover:bg-navy-800 text-white text-sm font-medium px-5 py-2 rounded-full transition-colors"
             >
               Get Started
             </button>
@@ -547,7 +548,7 @@ export default function Home() {
             >
               <span className="inline-flex items-center gap-2 text-sm text-gray-500 font-medium bg-gray-100 rounded-full px-4 py-1.5">
                 <Zap className="w-3.5 h-3.5" />
-                AI-Powered Auction Discovery
+                AI-Powered Auction Item Discovery
               </span>
             </motion.div>
 
@@ -555,7 +556,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.05, ease }}
-              className="text-5xl sm:text-6xl lg:text-[72px] font-bold text-gray-900 leading-[1.05] tracking-tight mb-6"
+              className="text-5xl sm:text-6xl lg:text-[72px] font-bold text-navy-900 leading-[1.05] tracking-tight mb-6"
             >
               Unlock the hidden
               <br />
@@ -572,7 +573,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.1, ease }}
               className="text-lg sm:text-xl text-gray-500 leading-relaxed mb-10 max-w-lg"
             >
-              Help supporters discover creative auction items they never knew they could give. Set up in 2 minutes.
+              Help supporters discover creative auction items they never knew they could give. Set up in 60 seconds.
             </motion.p>
 
             <motion.div
@@ -583,14 +584,14 @@ export default function Home() {
             >
               <button
                 onClick={scrollToForm}
-                className="group inline-flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-medium py-3.5 px-7 rounded-full transition-all text-[15px]"
+                className="group inline-flex items-center justify-center gap-2 bg-navy-900 hover:bg-navy-800 text-white font-medium py-3.5 px-7 rounded-full transition-all text-[15px]"
               >
                 Create your page
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
               <a
                 href="/org/demo"
-                className="inline-flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 font-medium py-3.5 px-7 rounded-full border border-gray-200 hover:border-gray-300 transition-all text-[15px] bg-white"
+                className="inline-flex items-center justify-center gap-2 text-gray-600 hover:text-navy-900 font-medium py-3.5 px-7 rounded-full border border-gray-200 hover:border-gray-300 transition-all text-[15px] bg-white"
               >
                 See a live demo
               </a>
@@ -622,7 +623,7 @@ export default function Home() {
                 </div>
                 <div className="hidden sm:flex gap-6">
                   {[
-                    { val: '2 min', sub: 'setup' },
+                    { val: '60 sec', sub: 'setup' },
                     { val: '30%', sub: 'more items' },
                     { val: 'Free', sub: 'forever' },
                   ].map((s, i) => (
@@ -667,7 +668,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 className="absolute -bottom-6 -right-6 bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hidden sm:block"
               >
-                <p className="text-3xl font-bold text-gray-900">30%</p>
+                <p className="text-3xl font-bold text-navy-900">30%</p>
                 <p className="text-sm text-gray-500">more auction items<br />on average</p>
               </motion.div>
             </motion.div>
@@ -680,7 +681,7 @@ export default function Home() {
               viewport={{ once: true }}
             >
               <p className="text-sm font-medium text-emerald-600 mb-3 tracking-wide uppercase">Why it works</p>
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-6">
+              <h2 className="text-3xl sm:text-4xl font-bold text-navy-900 tracking-tight mb-6">
                 Most donors don&apos;t know what to give. AI changes that.
               </h2>
               <p className="text-gray-500 text-lg leading-relaxed mb-10">
@@ -698,7 +699,7 @@ export default function Home() {
                       <f.icon className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 text-[15px]">{f.title}</p>
+                      <p className="font-semibold text-navy-900 text-[15px]">{f.title}</p>
                       <p className="text-gray-500 text-sm">{f.desc}</p>
                     </div>
                   </div>
@@ -722,7 +723,7 @@ export default function Home() {
             className="text-center mb-6"
           >
             <p className="text-sm font-medium text-emerald-600 mb-3 tracking-wide uppercase">See the difference</p>
-            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
+            <h2 className="text-4xl sm:text-5xl font-bold text-navy-900 tracking-tight">
               Same coffee shop. Way more impact.
             </h2>
           </motion.div>
@@ -734,7 +735,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center text-gray-500 text-lg max-w-2xl mx-auto mb-16"
           >
-            A local coffee shop usually donates a $25 gift card. With WCIO, AI helps them discover offerings that raise <span className="text-gray-900 font-semibold">8&ndash;24x more</span> — at almost no extra cost. Drag the slider to compare.
+            A local coffee shop usually donates a $25 gift card. With WCIO, AI helps them discover offerings that raise <span className="text-navy-900 font-semibold">8&ndash;24x more</span> — at almost no extra cost. Drag the slider to compare.
           </motion.p>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -762,7 +763,7 @@ export default function Home() {
             </div>
             <button
               onClick={scrollToForm}
-              className="group bg-white hover:bg-gray-100 text-gray-900 font-medium py-3 px-6 rounded-full transition-all text-sm flex items-center gap-2 flex-shrink-0"
+              className="group bg-white hover:bg-gray-100 text-navy-900 font-medium py-3 px-6 rounded-full transition-all text-sm flex items-center gap-2 flex-shrink-0"
             >
               Try it free
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -784,7 +785,7 @@ export default function Home() {
             className="text-center mb-20"
           >
             <p className="text-sm font-medium text-emerald-600 mb-3 tracking-wide uppercase">How it works</p>
-            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
+            <h2 className="text-4xl sm:text-5xl font-bold text-navy-900 tracking-tight">
               Three steps to better auctions
             </h2>
           </motion.div>
@@ -828,10 +829,10 @@ export default function Home() {
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-gray-900">{item.num}</span>
+                    <span className="text-sm font-semibold text-navy-900">{item.num}</span>
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 tracking-tight">{item.title}</h3>
+                <h3 className="text-xl font-semibold text-navy-900 mb-2 tracking-tight">{item.title}</h3>
                 <p className="text-gray-500 leading-relaxed text-[15px]">{item.desc}</p>
               </motion.div>
             ))}
@@ -848,7 +849,7 @@ export default function Home() {
             transition={{ duration: 0.7, ease }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-3">
+            <h2 className="text-3xl sm:text-4xl font-bold text-navy-900 tracking-tight mb-3">
               Get started for free
             </h2>
             <p className="text-gray-500 text-lg">
@@ -1013,7 +1014,7 @@ export default function Home() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 text-white font-medium py-3.5 rounded-full transition-colors flex items-center justify-center gap-2 text-[15px]"
+              className="w-full bg-navy-900 hover:bg-navy-800 disabled:bg-gray-400 text-white font-medium py-3.5 rounded-full transition-colors flex items-center justify-center gap-2 text-[15px]"
             >
               {loading ? (
                 <>
@@ -1057,10 +1058,10 @@ export default function Home() {
             </a>
           </div>
           <div className="flex gap-8 text-sm text-gray-400">
-            <a href="https://betterworld.org/privacy" className="hover:text-gray-600 transition-colors">
+            <a href="https://help.betterworld.org/en/articles/8557905-privacy-policy" className="hover:text-gray-600 transition-colors">
               Privacy
             </a>
-            <a href="https://betterworld.org/terms" className="hover:text-gray-600 transition-colors">
+            <a href="https://help.betterworld.org/en/articles/8557943-terms-conditions" className="hover:text-gray-600 transition-colors">
               Terms
             </a>
             <a href="mailto:support@betterworld.org" className="hover:text-gray-600 transition-colors">

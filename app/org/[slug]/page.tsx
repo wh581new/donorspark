@@ -223,7 +223,7 @@ function SuggestionCard({
               )}
             </div>
 
-            <h3 className="text-lg font-bold text-gray-900 leading-snug mb-2">{item.title}</h3>
+            <h3 className="text-lg font-bold text-navy-900 leading-snug mb-2">{item.title}</h3>
             <p className="text-sm text-gray-600 leading-relaxed mb-4">{item.description}</p>
 
             <div className="flex flex-wrap gap-3 mb-4">
@@ -295,17 +295,41 @@ function SuggestionCard({
    ═══════════════════════════════════════════════ */
 function LoadingState({ isMore }: { isMore: boolean }) {
   const messages = isMore
-    ? ['Finding fresh ideas...', 'Thinking outside the box...', 'Brainstorming...']
-    : ['Analyzing your profile...', 'Discovering hidden gems...', 'Crafting offerings...', 'Almost there...'];
+    ? [
+        { text: 'Finding fresh ideas...', emoji: '💡' },
+        { text: 'Thinking outside the box...', emoji: '📦' },
+        { text: 'Brainstorming...', emoji: '🧠' },
+      ]
+    : [
+        { text: 'Getting to know you...', emoji: '👋' },
+        { text: 'Discovering hidden gems...', emoji: '💎' },
+        { text: 'Matching your skills to ideas...', emoji: '🎯' },
+        { text: 'Crafting personalized offerings...', emoji: '✨' },
+        { text: 'Polishing the final touches...', emoji: '💫' },
+      ];
   const [msgIdx, setMsgIdx] = useState(0);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const timer = setInterval(() => setMsgIdx(i => (i + 1) % messages.length), 3000);
+    const timer = setInterval(() => setMsgIdx(i => (i + 1) % messages.length), 2400);
     return () => clearInterval(timer);
   }, [messages.length]);
 
+  useEffect(() => {
+    if (isMore) return;
+    const start = Date.now();
+    const duration = 15000;
+    const tick = () => {
+      const elapsed = Date.now() - start;
+      const pct = Math.min(95, (elapsed / duration) * 100);
+      setProgress(pct);
+      if (pct < 95) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [isMore]);
+
   return (
-    <motion.div {...pageTransition} className="max-w-lg mx-auto text-center py-20">
+    <motion.div {...pageTransition} className="max-w-md mx-auto text-center py-20">
       <motion.div
         className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mx-auto mb-8 shadow-lg shadow-emerald-200/40"
         animate={{ scale: [1, 1.05, 1], rotate: [0, 5, -5, 0] }}
@@ -315,29 +339,43 @@ function LoadingState({ isMore }: { isMore: boolean }) {
       </motion.div>
 
       <AnimatePresence mode="wait">
-        <motion.p
+        <motion.div
           key={msgIdx}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="text-lg font-medium text-gray-800 mb-3"
+          className="mb-3"
         >
-          {messages[msgIdx]}
-        </motion.p>
+          <span className="text-2xl mb-1 block">{messages[msgIdx].emoji}</span>
+          <p className="text-lg font-medium text-gray-800">{messages[msgIdx].text}</p>
+        </motion.div>
       </AnimatePresence>
 
-      <div className="flex justify-center gap-2 mt-6">
-        {[0, 1, 2].map(i => (
-          <motion.div
-            key={i}
-            className="w-2 h-2 rounded-full bg-emerald-400"
-            animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
-          />
-        ))}
-      </div>
+      {!isMore && (
+        <div className="mt-8 max-w-xs mx-auto">
+          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full"
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            />
+          </div>
+          <p className="text-xs text-gray-400 mt-3">Our AI is working its magic</p>
+        </div>
+      )}
 
-      {!isMore && <p className="text-sm text-gray-600 mt-8">This usually takes 10-20 seconds</p>}
+      {isMore && (
+        <div className="flex justify-center gap-2 mt-6">
+          {[0, 1, 2].map(i => (
+            <motion.div
+              key={i}
+              className="w-2 h-2 rounded-full bg-emerald-400"
+              animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
+            />
+          ))}
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -352,6 +390,7 @@ function ShareModal({
   orgSlug,
   brandColor,
   onClose,
+  onSuccess,
 }: {
   selectedItems: AuctionSuggestion[];
   donorSummary: string;
@@ -359,6 +398,7 @@ function ShareModal({
   orgSlug: string;
   brandColor: string;
   onClose: () => void;
+  onSuccess: () => void;
 }) {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
@@ -399,8 +439,8 @@ function ShareModal({
       setSuccess(true);
       setTimeout(() => {
         onClose();
-        setSuccess(false);
-      }, 2000);
+        onSuccess();
+      }, 1500);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
@@ -427,7 +467,7 @@ function ShareModal({
           className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/20"
         >
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-bold text-gray-900">Share your offerings</h3>
+            <h3 className="text-2xl font-bold text-navy-900">Share your offerings</h3>
             <button onClick={onClose} disabled={sending} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50" aria-label="Close">
               <X className="w-5 h-5 text-gray-600" />
             </button>
@@ -437,17 +477,17 @@ function ShareModal({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Your name</label>
               <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Jane Doe" disabled={sending}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 text-sm transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 disabled:opacity-50" />
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-navy-900 placeholder-gray-400 text-sm transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 disabled:opacity-50" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="jane@example.com" disabled={sending}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 text-sm transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 disabled:opacity-50" />
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-navy-900 placeholder-gray-400 text-sm transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 disabled:opacity-50" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Personal note (optional)</label>
               <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Add a personal message..." disabled={sending} rows={3}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 text-sm transition-all resize-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 disabled:opacity-50" />
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-navy-900 placeholder-gray-400 text-sm transition-all resize-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 disabled:opacity-50" />
             </div>
             <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200/50">
               <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest mb-2">
@@ -471,6 +511,103 @@ function ShareModal({
         </motion.div>
       </motion.div>
     </>
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   Thank You Page
+   ═══════════════════════════════════════════════ */
+function ThankYouPage({ orgName, orgSlug, brandColor }: { orgName: string; orgSlug: string; brandColor: string }) {
+  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/org/${orgSlug}` : '';
+  const [copied, setCopied] = useState(false);
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const shareText = `I just discovered creative auction items I can donate to ${orgName} using What Could I Offer! Try it yourself:`;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
+      className="max-w-lg mx-auto text-center py-16 px-4"
+    >
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: [0, 1.3, 1] }}
+        transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] as const }}
+        className="text-6xl mb-6"
+      >
+        🎉
+      </motion.div>
+
+      <motion.h2
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="text-3xl font-bold text-navy-900 mb-3 tracking-tight"
+      >
+        Thank you!
+      </motion.h2>
+
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="text-gray-600 text-lg mb-10 leading-relaxed"
+      >
+        Your offerings have been shared with <span className="font-semibold text-navy-900">{orgName}</span>. You&apos;re making a real difference.
+      </motion.p>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="bg-gray-50 rounded-3xl p-8 border border-gray-200/50 mb-8"
+      >
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <Heart className="w-5 h-5 text-rose-500" />
+          <h3 className="text-lg font-semibold text-navy-900">Share with a friend to do more good</h3>
+        </div>
+        <p className="text-sm text-gray-500 mb-6">Know someone who might have something amazing to offer? Pass it along!</p>
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={copyLink}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-gray-200 hover:border-gray-300 text-navy-900 font-medium text-sm transition-all"
+          >
+            {copied ? <><Check className="w-4 h-4 text-emerald-500" /> Copied!</> : <><Copy className="w-4 h-4" /> Copy link</>}
+          </motion.button>
+          <motion.a
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            href={`mailto:?subject=You should try this!&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white font-medium text-sm transition-all shadow-md"
+            style={{ backgroundColor: brandColor }}
+          >
+            <Mail className="w-4 h-4" /> Email a friend
+          </motion.a>
+        </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.7 }}
+        className="flex items-center justify-center gap-1.5 text-xs text-gray-400"
+      >
+        Powered by{' '}
+        <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer">
+          <img src="https://betterworld.org/assets/brand/wordmark-denim.svg" alt="BetterWorld" className="h-3 w-auto" draggable={false} />
+        </a>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -542,7 +679,7 @@ function TypeformScreen({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
-        className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 leading-tight max-w-xl"
+        className="text-3xl sm:text-4xl font-bold text-navy-900 mb-3 leading-tight max-w-xl"
       >
         {title}
       </motion.h2>
@@ -619,7 +756,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
   const [orgError, setOrgError] = useState(false);
 
   // Flow state
-  const [phase, setPhase] = useState<'flow' | 'results'>('flow');
+  const [phase, setPhase] = useState<'flow' | 'results' | 'thankyou'>('flow');
   const [screen, setScreen] = useState(0); // 0 = welcome, 1-6 = questions
   const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
   const [loading, setLoading] = useState(false);
@@ -798,7 +935,8 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center p-8">
           <Gift className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Organization not found</h2>
+          <h2 className="text-xl font-bold text-navy-900 mb-2">Organization not found</h2>
+
           <p className="text-gray-600 mb-6">This link doesn&apos;t seem to be active.</p>
           <a href="https://betterworld.org" className="text-emerald-600 hover:text-emerald-700 font-medium">
             Go to betterworld &rarr;
@@ -841,8 +979,11 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                 )}
               </div>
               <div>
-                <h1 className="text-sm font-semibold text-gray-900">{org.name}</h1>
-                <p className="text-xs text-gray-500">powered by betterworld</p>
+                <h1 className="text-sm font-semibold text-navy-900">{org.name}</h1>
+                <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors">
+                  powered by
+                  <img src="https://betterworld.org/assets/brand/wordmark-denim.svg" alt="BetterWorld" className="h-2.5 w-auto" draggable={false} />
+                </a>
               </div>
             </div>
             {(screen > 0 || phase === 'results') && (
@@ -850,7 +991,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={startOver}
-                className="text-xs text-gray-600 hover:text-gray-900 flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-all font-medium"
+                className="text-xs text-gray-600 hover:text-navy-900 flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-all font-medium"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 Start over
@@ -927,7 +1068,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       variants={fadeUp}
                       initial="initial"
                       animate="animate"
-                      className="text-4xl sm:text-6xl font-bold text-gray-900 mb-6 tracking-tight leading-tight"
+                      className="text-4xl sm:text-6xl font-bold text-navy-900 mb-6 tracking-tight leading-tight"
                     >
                       You have more to<br />
                       <span className="text-emerald-600">offer</span>
@@ -1004,7 +1145,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                           className={`text-left p-6 rounded-2xl border-2 transition-all duration-200 ${
                             isSelected
                               ? 'shadow-md text-white'
-                              : 'bg-white border-gray-200 hover:border-gray-300 text-gray-900'
+                              : 'bg-white border-gray-200 hover:border-gray-300 text-navy-900'
                           }`}
                           style={isSelected ? { backgroundColor: brandColor, borderColor: brandColor } : {}}
                         >
@@ -1038,7 +1179,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                         onChange={e => setUnified(prev => ({ ...prev, occupation: e.target.value }))}
                         onKeyDown={handleKeyDown}
                         placeholder="e.g., Software engineer, Yoga instructor, Dentist..."
-                        className="w-full text-center text-xl px-6 py-4 rounded-2xl border-2 border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
+                        className="w-full text-center text-xl px-6 py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
                       />
                     ) : (
                       <>
@@ -1049,7 +1190,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                           onChange={e => setUnified(prev => ({ ...prev, businessName: e.target.value }))}
                           onKeyDown={handleKeyDown}
                           placeholder="Business name"
-                          className="w-full text-center text-xl px-6 py-4 rounded-2xl border-2 border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
+                          className="w-full text-center text-xl px-6 py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
                         />
                         <input
                           type="text"
@@ -1057,7 +1198,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                           onChange={e => setUnified(prev => ({ ...prev, industry: e.target.value }))}
                           onKeyDown={handleKeyDown}
                           placeholder="Industry (e.g., Restaurant, Real estate, Consulting...)"
-                          className="w-full text-center text-lg px-6 py-3.5 rounded-2xl border-2 border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
+                          className="w-full text-center text-lg px-6 py-3.5 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
                         />
                       </>
                     )}
@@ -1085,7 +1226,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       onChange={e => setUnified(prev => ({ ...prev, interestsOther: e.target.value }))}
                       onKeyDown={handleKeyDown}
                       placeholder="Anything else? (e.g., beekeeping, pottery, salsa dancing...)"
-                      className="w-full text-center text-sm px-5 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 outline-none"
+                      className="w-full text-center text-sm px-5 py-3 rounded-xl border border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 outline-none"
                     />
                   </div>
                 </TypeformScreen>
@@ -1104,7 +1245,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                     onChange={e => setUnified(prev => ({ ...prev, hiddenTalents: e.target.value }))}
                     placeholder="e.g., I make incredible sourdough, I used to be a pilot, I can teach anyone to play guitar, I know every restaurant owner in town..."
                     rows={4}
-                    className="w-full text-center text-lg px-6 py-4 rounded-2xl border-2 border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none resize-none"
+                    className="w-full text-center text-lg px-6 py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none resize-none"
                   />
                   <p className="text-xs text-gray-400 mt-3">Press Enter or click Next to continue. Leave blank to skip.</p>
                 </TypeformScreen>
@@ -1130,7 +1271,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       onChange={e => setUnified(prev => ({ ...prev, assetsOther: e.target.value }))}
                       onKeyDown={handleKeyDown}
                       placeholder="Anything else? (e.g., wine cellar, recording studio, season tickets...)"
-                      className="w-full text-center text-sm px-5 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 outline-none"
+                      className="w-full text-center text-sm px-5 py-3 rounded-xl border border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 outline-none"
                     />
                   </div>
                 </TypeformScreen>
@@ -1149,7 +1290,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                     onChange={e => setUnified(prev => ({ ...prev, socialText: e.target.value }))}
                     placeholder="Paste your LinkedIn/bio here, or describe anything else about yourself that might inspire great auction items..."
                     rows={4}
-                    className="w-full text-lg px-6 py-4 rounded-2xl border-2 border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none resize-none"
+                    className="w-full text-lg px-6 py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none resize-none"
                   />
 
                   {error && (
@@ -1237,7 +1378,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
 
               <div className="mb-10 flex items-end justify-between">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Your personalized offerings</h2>
+                  <h2 className="text-3xl font-bold text-navy-900 mb-2">Your personalized offerings</h2>
                   <p className="text-gray-600">
                     We found {allSuggestions.length} offering{allSuggestions.length !== 1 ? 's' : ''} tailored to you
                     {hiddenGemsCount > 0 && ` (including ${hiddenGemsCount} hidden gem${hiddenGemsCount !== 1 ? 's' : ''})`}
@@ -1292,7 +1433,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                     whileTap={{ scale: 0.99 }}
                     onClick={() => handleSubmit(true)}
                     disabled={loadingMore}
-                    className="px-6 py-3 rounded-xl border-2 border-gray-300 text-gray-900 font-semibold transition-all hover:border-emerald-400 hover:text-emerald-700"
+                    className="px-6 py-3 rounded-xl border-2 border-gray-300 text-navy-900 font-semibold transition-all hover:border-emerald-400 hover:text-emerald-700"
                   >
                     <span className="flex items-center gap-2">
                       <Lightbulb className="w-4 h-4" /> Get more ideas
@@ -1323,10 +1464,16 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                     orgSlug={org.slug}
                     brandColor={brandColor}
                     onClose={() => setShowShareModal(false)}
+                    onSuccess={() => setPhase('thankyou')}
                   />
                 )}
               </AnimatePresence>
             </motion.div>
+          )}
+
+          {/* ═══ THANK YOU ═══ */}
+          {phase === 'thankyou' && (
+            <ThankYouPage orgName={org.name} orgSlug={org.slug} brandColor={brandColor} />
           )}
         </AnimatePresence>
       </main>
@@ -1337,14 +1484,18 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="text-center pb-8 pt-4"
+          className="text-center pb-8 pt-4 space-y-2"
         >
-          <p className="text-xs text-gray-500">
+          <div className="flex items-center justify-center gap-1.5 text-xs text-gray-500">
             Built by{' '}
-            <a href="https://betterworld.org" className="text-emerald-600 hover:text-emerald-700 font-semibold">
-              betterworld
+            <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer" className="inline-flex">
+              <img src="https://betterworld.org/assets/brand/wordmark-denim.svg" alt="BetterWorld" className="h-3 w-auto" draggable={false} />
             </a>
-          </p>
+          </div>
+          <div className="flex items-center justify-center gap-4 text-[10px] text-gray-400">
+            <a href="https://help.betterworld.org/en/articles/8557905-privacy-policy" className="hover:text-gray-600 transition-colors">Privacy</a>
+            <a href="https://help.betterworld.org/en/articles/8557943-terms-conditions" className="hover:text-gray-600 transition-colors">Terms</a>
+          </div>
         </motion.div>
       )}
     </div>
