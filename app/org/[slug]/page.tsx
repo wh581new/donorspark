@@ -828,7 +828,7 @@ const ASSET_OPTIONS = [
   { label: 'Company / Business', icon: <Building2 className="w-4 h-4" /> },
   { label: 'Vehicle / Classic Car', icon: <Car className="w-4 h-4" /> },
   { label: 'Studio / Workshop', icon: <Wrench className="w-4 h-4" /> },
-  { label: 'Pool or Hot Tub', icon: <Sparkles className="w-4 h-4" /> },
+  { label: 'Pool', icon: <Sparkles className="w-4 h-4" /> },
 ];
 
 /* ═══════════════════════════════════════════════
@@ -1378,13 +1378,13 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                 <TypeformScreen
                   screenNum="Step 6 of 6 — Optional"
                   title="Anything else we should know?"
-                  subtitle="Paste your LinkedIn bio, or add extra context. Or just hit Discover!"
+                  subtitle="Paste your LinkedIn bio, Insta bio, or add extra context. Or just hit Discover!"
                 >
                   <textarea
                     ref={inputRef as React.RefObject<HTMLTextAreaElement>}
                     value={unified.socialText || ''}
                     onChange={e => setUnified(prev => ({ ...prev, socialText: e.target.value }))}
-                    placeholder="Paste your LinkedIn/bio here, or describe anything else about yourself that might inspire great auction items..."
+                    placeholder="Paste your LinkedIn bio, Insta bio, or anything else about yourself that might inspire great auction items..."
                     rows={4}
                     className="w-full text-lg px-6 py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none resize-none"
                   />
