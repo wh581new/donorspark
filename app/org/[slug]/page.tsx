@@ -5,9 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
   Lightbulb,
-  MessageSquareText,
-  ClipboardList,
-  Linkedin,
   ArrowRight,
   ArrowLeft,
   Loader2,
@@ -30,11 +27,28 @@ import {
   Users,
   Mail,
   ExternalLink,
+  Building2,
+  User,
+  Briefcase,
+  Palette,
+  Music,
+  Camera,
+  Utensils,
+  Dumbbell,
+  BookOpen,
+  Globe,
+  Wrench,
+  TreePine,
+  Home,
+  Car,
+  Sailboat,
+  Laptop,
+  Mic,
 } from 'lucide-react';
 import {
   DonorType,
   InputMethod,
-  GuidedAnswers,
+  UnifiedAnswers,
   DonorInput,
   AuctionSuggestion,
   SuggestionsResponse,
@@ -60,15 +74,16 @@ const fadeUp = {
   animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
-const scaleIn = {
-  initial: { opacity: 0, scale: 0.95 },
-  animate: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const } },
-};
-
 const cardReveal = {
   initial: { opacity: 0, y: 30, scale: 0.97 },
   animate: { opacity: 1, y: 0, scale: 1 },
   transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+};
+
+const slideVariants = {
+  enter: (dir: number) => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir: number) => ({ x: dir > 0 ? -80 : 80, opacity: 0 }),
 };
 
 /* ═══════════════════════════════════════════════
@@ -130,41 +145,7 @@ function FloatingParticles() {
 }
 
 /* ═══════════════════════════════════════════════
-   Progress Steps
-   ═══════════════════════════════════════════════ */
-function ProgressSteps({ current }: { current: number }) {
-  const steps = ['Tell us about you', 'Discover offerings', 'Share with org'];
-  return (
-    <div className="flex items-center justify-center gap-2 mb-12">
-      {steps.map((label, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <motion.div
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-500 ${
-              i < current
-                ? 'bg-emerald-600 text-white'
-                : i === current
-                ? 'bg-emerald-100 text-emerald-700 ring-2 ring-emerald-300'
-                : 'bg-gray-100 text-gray-400'
-            }`}
-            animate={i === current ? { scale: [1, 1.05, 1] } : {}}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            {i < current ? <Check className="w-3 h-3" /> : <span>{i + 1}</span>}
-            <span className="hidden sm:inline">{label}</span>
-          </motion.div>
-          {i < steps.length - 1 && (
-            <div className={`w-8 h-0.5 rounded-full transition-colors duration-500 ${
-              i < current ? 'bg-emerald-400' : 'bg-gray-200'
-            }`} />
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════
-   Suggestion Card — Apple-level premium design
+   Suggestion Card
    ═══════════════════════════════════════════════ */
 function SuggestionCard({
   item,
@@ -206,7 +187,6 @@ function SuggestionCard({
           : 'border-gray-200 shadow-sm hover:border-gray-300 hover:shadow-md'
       }`}
     >
-      {/* Selection indicator bar */}
       <motion.div
         className="absolute top-0 left-0 w-1.5 h-full rounded-r-full"
         style={{ backgroundColor: brandColor }}
@@ -216,15 +196,8 @@ function SuggestionCard({
 
       <div className="p-6 sm:p-7">
         <div className="flex items-start gap-4">
-          {/* Select toggle */}
-          <motion.div
-            className="flex-shrink-0 mt-1"
-            whileTap={{ scale: 0.85 }}
-          >
-            <motion.div
-              animate={selected ? { scale: [1, 1.2, 1] } : {}}
-              transition={{ duration: 0.3 }}
-            >
+          <motion.div className="flex-shrink-0 mt-1" whileTap={{ scale: 0.85 }}>
+            <motion.div animate={selected ? { scale: [1, 1.2, 1] } : {}} transition={{ duration: 0.3 }}>
               {selected ? (
                 <CheckCircle2 className="w-6 h-6" style={{ color: brandColor }} />
               ) : (
@@ -234,7 +207,6 @@ function SuggestionCard({
           </motion.div>
 
           <div className="flex-1 min-w-0">
-            {/* Badges */}
             <div className="flex items-center gap-2 mb-3 flex-wrap">
               <span className="text-xs font-semibold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg">
                 {item.category}
@@ -251,17 +223,9 @@ function SuggestionCard({
               )}
             </div>
 
-            {/* Title */}
-            <h3 className="text-lg font-bold text-gray-900 leading-snug mb-2">
-              {item.title}
-            </h3>
+            <h3 className="text-lg font-bold text-gray-900 leading-snug mb-2">{item.title}</h3>
+            <p className="text-sm text-gray-600 leading-relaxed mb-4">{item.description}</p>
 
-            {/* Description */}
-            <p className="text-sm text-gray-600 leading-relaxed mb-4">
-              {item.description}
-            </p>
-
-            {/* Value chips */}
             <div className="flex flex-wrap gap-3 mb-4">
               <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl">
                 <DollarSign className="w-4 h-4 flex-shrink-0" />
@@ -279,13 +243,11 @@ function SuggestionCard({
               </div>
             </div>
 
-            {/* Why it works */}
             <p className="text-xs text-gray-600 flex items-start gap-2 mb-3">
               <Zap className="w-3.5 h-3.5 mt-0.5 text-amber-500 flex-shrink-0" />
               <span>{item.whyItWorks}</span>
             </p>
 
-            {/* Expandable catalog copy */}
             <button
               onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}
               className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
@@ -308,9 +270,7 @@ function SuggestionCard({
                 >
                   <div className="mt-3 bg-gray-50 rounded-2xl p-4 backdrop-blur-sm border border-gray-200/50">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">
-                        Ready-to-Use Copy
-                      </span>
+                      <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">Ready-to-Use Copy</span>
                       <button
                         onClick={(e) => { e.stopPropagation(); copyCatalog(); }}
                         className="text-xs text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
@@ -318,9 +278,7 @@ function SuggestionCard({
                         {copied ? <><Check className="w-3 h-3" /> Copied!</> : <><Copy className="w-3 h-3" /> Copy</>}
                       </button>
                     </div>
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      &ldquo;{item.catalogDescription}&rdquo;
-                    </p>
+                    <p className="text-sm text-gray-700 leading-relaxed">&ldquo;{item.catalogDescription}&rdquo;</p>
                   </div>
                 </motion.div>
               )}
@@ -333,7 +291,7 @@ function SuggestionCard({
 }
 
 /* ═══════════════════════════════════════════════
-   Beautiful Loading State
+   Loading State
    ═══════════════════════════════════════════════ */
 function LoadingState({ isMore }: { isMore: boolean }) {
   const messages = isMore
@@ -347,16 +305,10 @@ function LoadingState({ isMore }: { isMore: boolean }) {
   }, [messages.length]);
 
   return (
-    <motion.div
-      {...pageTransition}
-      className="max-w-lg mx-auto text-center py-20"
-    >
+    <motion.div {...pageTransition} className="max-w-lg mx-auto text-center py-20">
       <motion.div
         className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mx-auto mb-8 shadow-lg shadow-emerald-200/40"
-        animate={{
-          scale: [1, 1.05, 1],
-          rotate: [0, 5, -5, 0],
-        }}
+        animate={{ scale: [1, 1.05, 1], rotate: [0, 5, -5, 0] }}
         transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
       >
         <Sparkles className="w-10 h-10 text-white" />
@@ -385,17 +337,13 @@ function LoadingState({ isMore }: { isMore: boolean }) {
         ))}
       </div>
 
-      {!isMore && (
-        <p className="text-sm text-gray-600 mt-8">
-          This usually takes 10-20 seconds
-        </p>
-      )}
+      {!isMore && <p className="text-sm text-gray-600 mt-8">This usually takes 10-20 seconds</p>}
     </motion.div>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Share Modal — premium glass effect
+   Share Modal
    ═══════════════════════════════════════════════ */
 function ShareModal({
   selectedItems,
@@ -437,7 +385,7 @@ function ShareModal({
           donorEmail: email,
           orgName,
           orgSlug,
-          orgEmail: '', // resolved server-side
+          orgEmail: '',
           donorSummary,
           selectedOfferings: selectedItems,
         }),
@@ -480,12 +428,7 @@ function ShareModal({
         >
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-2xl font-bold text-gray-900">Share your offerings</h3>
-            <button
-              onClick={onClose}
-              disabled={sending}
-              className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
-              aria-label="Close share dialog"
-            >
+            <button onClick={onClose} disabled={sending} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50" aria-label="Close">
               <X className="w-5 h-5 text-gray-600" />
             </button>
           </div>
@@ -493,40 +436,19 @@ function ShareModal({
           <div className="space-y-4 mb-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Your name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Jane Doe"
-                disabled={sending}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 text-sm transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 disabled:opacity-50"
-              />
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Jane Doe" disabled={sending}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 text-sm transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 disabled:opacity-50" />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="jane@example.com"
-                disabled={sending}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 text-sm transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 disabled:opacity-50"
-              />
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="jane@example.com" disabled={sending}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 text-sm transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 disabled:opacity-50" />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Personal note (optional)</label>
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Add a personal message..."
-                disabled={sending}
-                rows={3}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 text-sm transition-all resize-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 disabled:opacity-50"
-              />
+              <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Add a personal message..." disabled={sending} rows={3}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 text-sm transition-all resize-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 disabled:opacity-50" />
             </div>
-
             <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200/50">
               <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest mb-2">
                 Sharing {selectedItems.length} offering{selectedItems.length !== 1 ? 's' : ''}
@@ -538,25 +460,12 @@ function ShareModal({
               </ul>
             </div>
 
-            {error && (
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-red-600">
-                {error}
-              </motion.p>
-            )}
+            {error && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-red-600">{error}</motion.p>}
 
-            <motion.button
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              onClick={handleShare}
-              disabled={sending}
+            <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} onClick={handleShare} disabled={sending}
               className="mt-6 w-full py-3 rounded-xl text-white font-semibold disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
-              style={{ backgroundColor: brandColor || '#059669' }}
-            >
-              {sending ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>
-              ) : (
-                <><Send className="w-4 h-4" /> Share My Offerings</>
-              )}
+              style={{ backgroundColor: brandColor || '#059669' }}>
+              {sending ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</> : <><Send className="w-4 h-4" /> Share My Offerings</>}
             </motion.button>
           </div>
         </motion.div>
@@ -566,57 +475,131 @@ function ShareModal({
 }
 
 /* ═══════════════════════════════════════════════
-   Input Field with micro animation
+   Chip Selector — Typeform-style multi-select
    ═══════════════════════════════════════════════ */
-function InputField({
-  label,
-  placeholder,
-  value,
-  onChange,
-  multiline,
+function ChipSelector({
+  options,
+  selected,
+  onToggle,
+  brandColor,
 }: {
-  label: string;
-  placeholder: string;
-  value: string;
-  onChange: (v: string) => void;
-  multiline?: boolean;
+  options: { label: string; icon?: React.ReactNode }[];
+  selected: string[];
+  onToggle: (label: string) => void;
+  brandColor: string;
 }) {
-  const [focused, setFocused] = useState(false);
-
-  const cls = `w-full rounded-xl border p-3.5 text-gray-900 placeholder-gray-400 text-sm transition-all duration-200 resize-none ${
-    focused ? 'border-emerald-300 ring-2 ring-emerald-100 shadow-sm' : 'border-gray-200 hover:border-gray-300'
-  }`;
-
   return (
-    <motion.div variants={fadeUp}>
-      <label className="block text-sm font-semibold text-gray-900 mb-2">{label}</label>
-      {multiline ? (
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          placeholder={placeholder}
-          rows={5}
-          className={cls}
-        />
-      ) : (
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          placeholder={placeholder}
-          className={cls}
-        />
-      )}
-    </motion.div>
+    <div className="flex flex-wrap gap-3 justify-center">
+      {options.map((opt) => {
+        const isSelected = selected.includes(opt.label);
+        return (
+          <motion.button
+            key={opt.label}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            onClick={() => onToggle(opt.label)}
+            className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl border-2 text-sm font-medium transition-all duration-200 ${
+              isSelected
+                ? 'text-white shadow-md'
+                : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:shadow-sm'
+            }`}
+            style={isSelected ? { backgroundColor: brandColor, borderColor: brandColor } : {}}
+          >
+            {opt.icon}
+            {opt.label}
+            {isSelected && <Check className="w-4 h-4 ml-1" />}
+          </motion.button>
+        );
+      })}
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════
-   Main Org Donor Page
+   Typeform-style Screen Wrapper
+   ═══════════════════════════════════════════════ */
+function TypeformScreen({
+  children,
+  screenNum,
+  subtitle,
+  title,
+}: {
+  children: React.ReactNode;
+  screenNum: string;
+  subtitle?: string;
+  title: string;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center text-center">
+      <motion.span
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-xs font-bold text-emerald-600 uppercase tracking-[0.2em] mb-4"
+      >
+        {screenNum}
+      </motion.span>
+      <motion.h2
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 leading-tight max-w-xl"
+      >
+        {title}
+      </motion.h2>
+      {subtitle && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+          className="text-gray-500 mb-10 max-w-md"
+        >
+          {subtitle}
+        </motion.p>
+      )}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="w-full max-w-xl"
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   Interest & Asset Options
+   ═══════════════════════════════════════════════ */
+
+const INTEREST_OPTIONS = [
+  { label: 'Cooking', icon: <Utensils className="w-4 h-4" /> },
+  { label: 'Photography', icon: <Camera className="w-4 h-4" /> },
+  { label: 'Music', icon: <Music className="w-4 h-4" /> },
+  { label: 'Art & Design', icon: <Palette className="w-4 h-4" /> },
+  { label: 'Fitness', icon: <Dumbbell className="w-4 h-4" /> },
+  { label: 'Travel', icon: <Globe className="w-4 h-4" /> },
+  { label: 'Reading', icon: <BookOpen className="w-4 h-4" /> },
+  { label: 'Outdoors', icon: <TreePine className="w-4 h-4" /> },
+  { label: 'DIY & Crafts', icon: <Wrench className="w-4 h-4" /> },
+  { label: 'Sports', icon: <Zap className="w-4 h-4" /> },
+  { label: 'Tech', icon: <Laptop className="w-4 h-4" /> },
+  { label: 'Public Speaking', icon: <Mic className="w-4 h-4" /> },
+];
+
+const ASSET_OPTIONS = [
+  { label: 'Vacation Home', icon: <Home className="w-4 h-4" /> },
+  { label: 'Boat or Watercraft', icon: <Sailboat className="w-4 h-4" /> },
+  { label: 'Nice Backyard / Patio', icon: <TreePine className="w-4 h-4" /> },
+  { label: 'Professional Network', icon: <Users className="w-4 h-4" /> },
+  { label: 'Company / Business', icon: <Building2 className="w-4 h-4" /> },
+  { label: 'Vehicle / Classic Car', icon: <Car className="w-4 h-4" /> },
+  { label: 'Studio / Workshop', icon: <Wrench className="w-4 h-4" /> },
+  { label: 'Pool or Hot Tub', icon: <Sparkles className="w-4 h-4" /> },
+];
+
+/* ═══════════════════════════════════════════════
+   Main Org Donor Page — Unified Typeform Flow
    ═══════════════════════════════════════════════ */
 
 interface OrgData {
@@ -628,16 +611,22 @@ interface OrgData {
   brandColor: string;
 }
 
+const TOTAL_SCREENS = 6;
+
 export default function OrgDonorPage({ params }: { params: { slug: string } }) {
   const [org, setOrg] = useState<OrgData | null>(null);
   const [orgLoading, setOrgLoading] = useState(true);
   const [orgError, setOrgError] = useState(false);
 
-  const [step, setStep] = useState<'select' | 'input' | 'results'>('select');
-  const [method, setMethod] = useState<InputMethod | null>(null);
+  // Flow state
+  const [phase, setPhase] = useState<'flow' | 'results'>('flow');
+  const [screen, setScreen] = useState(0); // 0 = welcome, 1-6 = questions
+  const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Results state
   const [allSuggestions, setAllSuggestions] = useState<AuctionSuggestion[]>([]);
   const [donorSummary, setDonorSummary] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -645,14 +634,16 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
   const [logoClicks, setLogoClicks] = useState(0);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
 
-  // Form state
-  const [freetext, setFreetext] = useState('');
-  const [donorType, setDonorType] = useState<DonorType>('individual');
-  const [guided, setGuided] = useState<GuidedAnswers>({ donorType: 'individual' });
-  const [socialText, setSocialText] = useState('');
+  // Unified answers
+  const [unified, setUnified] = useState<UnifiedAnswers>({
+    donorType: 'individual',
+    interests: [],
+    assets: [],
+  });
   const [nonprofitContext, setNonprofitContext] = useState('');
 
   const resultsRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
 
   // Load org data
   useEffect(() => {
@@ -665,24 +656,62 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
       .catch(() => { setOrgError(true); setOrgLoading(false); });
   }, [params.slug]);
 
+  // Auto-focus text inputs when screen changes
+  useEffect(() => {
+    if (inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 400);
+    }
+  }, [screen]);
+
   const brandColor = org?.brandColor || '#059669';
 
-  const updateGuided = (key: keyof GuidedAnswers, value: string) => {
-    setGuided(prev => ({ ...prev, [key]: value }));
+  const goNext = () => {
+    setDirection(1);
+    if (screen < TOTAL_SCREENS) {
+      setScreen(s => s + 1);
+    } else {
+      handleSubmit(false);
+    }
+  };
+
+  const goBack = () => {
+    setDirection(-1);
+    if (screen > 0) setScreen(s => s - 1);
+  };
+
+  // Handle Enter key to advance
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      goNext();
+    }
+  };
+
+  const toggleInterest = (label: string) => {
+    setUnified(prev => ({
+      ...prev,
+      interests: prev.interests.includes(label)
+        ? prev.interests.filter(i => i !== label)
+        : [...prev.interests, label],
+    }));
+  };
+
+  const toggleAsset = (label: string) => {
+    setUnified(prev => ({
+      ...prev,
+      assets: prev.assets.includes(label)
+        ? prev.assets.filter(a => a !== label)
+        : [...prev.assets, label],
+    }));
   };
 
   const buildInput = useCallback((): DonorInput => {
-    const input: DonorInput = {
-      method: method!,
+    return {
+      method: 'unified' as InputMethod,
+      unified,
       nonprofitContext: nonprofitContext || (org?.message ? `Event: ${org.message}` : undefined),
     };
-    switch (method) {
-      case 'freetext': input.freetext = freetext; break;
-      case 'guided': input.guided = { ...guided, donorType }; break;
-      case 'social': input.socialText = socialText; break;
-    }
-    return input;
-  }, [method, nonprofitContext, org, freetext, guided, donorType, socialText]);
+  }, [unified, nonprofitContext, org]);
 
   const handleSubmit = async (keepBrainstorming = false) => {
     keepBrainstorming ? setLoadingMore(true) : setLoading(true);
@@ -714,10 +743,14 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
         setDonorSummary(data.donorSummary);
         setSelectedIds(new Set());
       }
-      setStep('results');
+      setPhase('results');
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
+      // If it fails mid-generation, go back to last screen so user can retry
+      if (!keepBrainstorming) {
+        setScreen(TOTAL_SCREENS);
+      }
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -733,14 +766,12 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
   };
 
   const startOver = () => {
-    setStep('select');
-    setMethod(null);
+    setPhase('flow');
+    setScreen(0);
     setAllSuggestions([]);
     setDonorSummary('');
     setError(null);
-    setFreetext('');
-    setGuided({ donorType: 'individual' });
-    setSocialText('');
+    setUnified({ donorType: 'individual', interests: [], assets: [] });
     setNonprofitContext('');
     setSelectedIds(new Set());
   };
@@ -748,14 +779,13 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
   const selectedItems = Array.from(selectedIds).map(i => allSuggestions[i]);
   const hiddenGemsCount = allSuggestions.filter(s => s.isHiddenGem).length;
 
+  const progressPercent = phase === 'results' ? 100 : Math.round((screen / TOTAL_SCREENS) * 100);
+
   // ─── Loading org ───
   if (orgLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-        >
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}>
           <Sparkles className="w-8 h-8 text-emerald-600" />
         </motion.div>
       </div>
@@ -771,7 +801,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
           <h2 className="text-xl font-bold text-gray-900 mb-2">Organization not found</h2>
           <p className="text-gray-600 mb-6">This link doesn&apos;t seem to be active.</p>
           <a href="https://betterworld.org" className="text-emerald-600 hover:text-emerald-700 font-medium">
-            Go to betterworld →
+            Go to betterworld &rarr;
           </a>
         </div>
       </div>
@@ -779,8 +809,8 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* ─── Org-branded header with backdrop blur ─── */}
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* ─── Header ─── */}
       <header className="sticky top-0 z-20 border-b border-gray-200/50 backdrop-blur-md bg-white/80">
         <div className="max-w-5xl mx-auto px-4 py-4 sm:py-5">
           <div className="flex items-center justify-between">
@@ -815,13 +845,12 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                 <p className="text-xs text-gray-500">powered by betterworld</p>
               </div>
             </div>
-            {step !== 'select' && (
+            {(screen > 0 || phase === 'results') && (
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={startOver}
                 className="text-xs text-gray-600 hover:text-gray-900 flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-all font-medium"
-                aria-label="Start over"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 Start over
@@ -829,6 +858,17 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
             )}
           </div>
         </div>
+        {/* Progress bar */}
+        {phase === 'flow' && screen > 0 && (
+          <div className="h-1 bg-gray-100">
+            <motion.div
+              className="h-full rounded-r-full"
+              style={{ backgroundColor: brandColor }}
+              animate={{ width: `${progressPercent}%` }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            />
+          </div>
+        )}
       </header>
 
       {/* Easter egg toast */}
@@ -846,271 +886,339 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
         )}
       </AnimatePresence>
 
-      <main className="max-w-5xl mx-auto px-4 py-8 pb-32">
-        {/* Progress */}
-        {!loading && !loadingMore && (
-          <ProgressSteps current={step === 'select' ? 0 : step === 'input' ? 1 : 2} />
-        )}
-
+      {/* ─── Main Content ─── */}
+      <main className="flex-1 flex flex-col">
         <AnimatePresence mode="wait">
-          {/* ═══ STEP 1: Select Method ═══ */}
-          {step === 'select' && (
-            <motion.div key="select" {...pageTransition}>
-              <div className="relative">
-                <FloatingParticles />
-                <div className="relative text-center mb-14">
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.1, duration: 0.5 }}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6 bg-emerald-50 text-emerald-700"
-                  >
-                    <Gift className="w-4 h-4" />
-                    Discover your auction potential
-                  </motion.div>
+          {/* ═══ LOADING STATE ═══ */}
+          {loading && (
+            <motion.div key="loading" {...pageTransition} className="flex-1">
+              <LoadingState isMore={false} />
+            </motion.div>
+          )}
 
-                  <motion.h2
-                    variants={fadeUp}
-                    initial="initial"
-                    animate="animate"
-                    className="text-4xl sm:text-6xl font-bold text-gray-900 mb-6 tracking-tight leading-tight"
-                  >
-                    You have more to<br />
-                    <span className="text-emerald-600">offer</span>
-                  </motion.h2>
+          {/* ═══ UNIFIED FLOW ═══ */}
+          {!loading && phase === 'flow' && (
+            <motion.div
+              key={`screen-${screen}`}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="flex-1 flex flex-col items-center justify-center px-4 py-12 min-h-[60vh]"
+            >
+              {/* ─── Screen 0: Welcome ─── */}
+              {screen === 0 && (
+                <div className="relative w-full max-w-3xl mx-auto">
+                  <FloatingParticles />
+                  <div className="relative text-center">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.1, duration: 0.5 }}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6 bg-emerald-50 text-emerald-700"
+                    >
+                      <Gift className="w-4 h-4" />
+                      Discover your auction potential
+                    </motion.div>
 
-                  <motion.p
-                    variants={fadeUp}
-                    initial="initial"
-                    animate="animate"
-                    transition={{ delay: 0.15 }}
-                    className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed"
-                  >
-                    Tell us about yourself and we&apos;ll uncover creative, high-value auction offerings unique to you.
-                  </motion.p>
+                    <motion.h2
+                      variants={fadeUp}
+                      initial="initial"
+                      animate="animate"
+                      className="text-4xl sm:text-6xl font-bold text-gray-900 mb-6 tracking-tight leading-tight"
+                    >
+                      You have more to<br />
+                      <span className="text-emerald-600">offer</span>
+                    </motion.h2>
+
+                    <motion.p
+                      variants={fadeUp}
+                      initial="initial"
+                      animate="animate"
+                      transition={{ delay: 0.15 }}
+                      className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-12"
+                    >
+                      Answer a few quick questions and we&apos;ll uncover creative, high-value auction offerings you didn&apos;t know you had.
+                    </motion.p>
+
+                    <motion.button
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={goNext}
+                      className="px-10 py-4 rounded-2xl text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-3 mx-auto"
+                      style={{ backgroundColor: brandColor }}
+                    >
+                      Let&apos;s Go
+                      <ArrowRight className="w-5 h-5" />
+                    </motion.button>
+
+                    {/* Social proof */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                      className="mt-16"
+                    >
+                      <div className="flex items-center justify-center gap-1 mb-3">
+                        {[1, 2, 3, 4, 5].map(i => (
+                          <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                        ))}
+                      </div>
+                      <p className="text-sm text-gray-700 italic max-w-xl mx-auto leading-relaxed">
+                        &ldquo;I had no idea my backyard could be worth $2,000 at auction. This tool is incredible.&rdquo;
+                      </p>
+                      <p className="text-xs text-gray-500 mt-2">&mdash; Recent donor</p>
+                    </motion.div>
+                  </div>
                 </div>
+              )}
 
-                <motion.div
-                  variants={stagger}
-                  initial="initial"
-                  animate="animate"
-                  className="grid sm:grid-cols-3 gap-5 max-w-4xl mx-auto mb-16"
+              {/* ─── Screen 1: Individual or Business ─── */}
+              {screen === 1 && (
+                <TypeformScreen
+                  screenNum="Step 1 of 6"
+                  title="First, what describes you best?"
+                  subtitle="This helps us tailor our suggestions"
                 >
-                  {[
-                    {
-                      method: 'freetext' as InputMethod,
-                      icon: MessageSquareText,
-                      title: 'In Your Own Words',
-                      desc: 'Tell us what you do, love, and are good at',
-                    },
-                    {
-                      method: 'guided' as InputMethod,
-                      icon: ClipboardList,
-                      title: 'Quick Questions',
-                      desc: "Answer a few prompts — we'll do the rest",
-                    },
-                    {
-                      method: 'social' as InputMethod,
-                      icon: Linkedin,
-                      title: 'Paste Your Bio',
-                      desc: 'Drop in your LinkedIn or website bio',
-                    },
-                  ].map((opt) => {
-                    const Icon = opt.icon;
-                    return (
-                      <motion.button
-                        key={opt.method}
-                        variants={fadeUp}
-                        whileHover={{ y: -4, boxShadow: '0 20px 60px rgba(0,0,0,0.06)' }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => { setMethod(opt.method); setStep('input'); }}
-                        className="text-left p-7 bg-white rounded-3xl border border-gray-200 shadow-sm transition-all duration-300 group hover:border-gray-300"
-                      >
-                        <div className="w-11 h-11 bg-emerald-100 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-emerald-200 transition-colors">
-                          <Icon className="w-6 h-6 text-emerald-700" />
-                        </div>
-                        <h3 className="font-semibold text-gray-900 mb-1.5 text-base">
-                          {opt.title}
-                        </h3>
-                        <p className="text-sm text-gray-600 leading-relaxed">{opt.desc}</p>
-                      </motion.button>
-                    );
-                  })}
-                </motion.div>
+                  <div className="grid sm:grid-cols-2 gap-4 max-w-md mx-auto">
+                    {[
+                      { type: 'individual' as DonorType, icon: User, label: 'Individual', desc: 'Person donating time, skills, or assets' },
+                      { type: 'business' as DonorType, icon: Building2, label: 'Business', desc: 'Company or organization with services & space' },
+                    ].map(opt => {
+                      const Icon = opt.icon;
+                      const isSelected = unified.donorType === opt.type;
+                      return (
+                        <motion.button
+                          key={opt.type}
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() => {
+                            setUnified(prev => ({ ...prev, donorType: opt.type }));
+                            setTimeout(goNext, 300);
+                          }}
+                          className={`text-left p-6 rounded-2xl border-2 transition-all duration-200 ${
+                            isSelected
+                              ? 'shadow-md text-white'
+                              : 'bg-white border-gray-200 hover:border-gray-300 text-gray-900'
+                          }`}
+                          style={isSelected ? { backgroundColor: brandColor, borderColor: brandColor } : {}}
+                        >
+                          <Icon className={`w-8 h-8 mb-3 ${isSelected ? 'text-white' : 'text-emerald-600'}`} />
+                          <p className="font-semibold text-base mb-1">{opt.label}</p>
+                          <p className={`text-sm ${isSelected ? 'text-white/80' : 'text-gray-500'}`}>{opt.desc}</p>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </TypeformScreen>
+              )}
 
-                {/* Social proof */}
+              {/* ─── Screen 2: Occupation / Business Info ─── */}
+              {screen === 2 && (
+                <TypeformScreen
+                  screenNum="Step 2 of 6"
+                  title={unified.donorType === 'individual'
+                    ? "What do you do for work?"
+                    : "Tell us about your business"}
+                  subtitle={unified.donorType === 'individual'
+                    ? "Your profession is a goldmine for auction ideas"
+                    : "We'll find creative offerings beyond gift cards"}
+                >
+                  <div className="space-y-4">
+                    {unified.donorType === 'individual' ? (
+                      <input
+                        ref={inputRef as React.RefObject<HTMLInputElement>}
+                        type="text"
+                        value={unified.occupation || ''}
+                        onChange={e => setUnified(prev => ({ ...prev, occupation: e.target.value }))}
+                        onKeyDown={handleKeyDown}
+                        placeholder="e.g., Software engineer, Yoga instructor, Dentist..."
+                        className="w-full text-center text-xl px-6 py-4 rounded-2xl border-2 border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
+                      />
+                    ) : (
+                      <>
+                        <input
+                          ref={inputRef as React.RefObject<HTMLInputElement>}
+                          type="text"
+                          value={unified.businessName || ''}
+                          onChange={e => setUnified(prev => ({ ...prev, businessName: e.target.value }))}
+                          onKeyDown={handleKeyDown}
+                          placeholder="Business name"
+                          className="w-full text-center text-xl px-6 py-4 rounded-2xl border-2 border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
+                        />
+                        <input
+                          type="text"
+                          value={unified.industry || ''}
+                          onChange={e => setUnified(prev => ({ ...prev, industry: e.target.value }))}
+                          onKeyDown={handleKeyDown}
+                          placeholder="Industry (e.g., Restaurant, Real estate, Consulting...)"
+                          className="w-full text-center text-lg px-6 py-3.5 rounded-2xl border-2 border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
+                        />
+                      </>
+                    )}
+                  </div>
+                </TypeformScreen>
+              )}
+
+              {/* ─── Screen 3: Interests ─── */}
+              {screen === 3 && (
+                <TypeformScreen
+                  screenNum="Step 3 of 6"
+                  title="What are you into?"
+                  subtitle="Pick as many as you like — these spark our best ideas"
+                >
+                  <ChipSelector
+                    options={INTEREST_OPTIONS}
+                    selected={unified.interests}
+                    onToggle={toggleInterest}
+                    brandColor={brandColor}
+                  />
+                  <div className="mt-6">
+                    <input
+                      type="text"
+                      value={unified.interestsOther || ''}
+                      onChange={e => setUnified(prev => ({ ...prev, interestsOther: e.target.value }))}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Anything else? (e.g., beekeeping, pottery, salsa dancing...)"
+                      className="w-full text-center text-sm px-5 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 outline-none"
+                    />
+                  </div>
+                </TypeformScreen>
+              )}
+
+              {/* ─── Screen 4: Hidden Talents ─── */}
+              {screen === 4 && (
+                <TypeformScreen
+                  screenNum="Step 4 of 6"
+                  title="Any hidden talents or skills?"
+                  subtitle="The things people don't know about you are often the most valuable"
+                >
+                  <textarea
+                    ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+                    value={unified.hiddenTalents || ''}
+                    onChange={e => setUnified(prev => ({ ...prev, hiddenTalents: e.target.value }))}
+                    placeholder="e.g., I make incredible sourdough, I used to be a pilot, I can teach anyone to play guitar, I know every restaurant owner in town..."
+                    rows={4}
+                    className="w-full text-center text-lg px-6 py-4 rounded-2xl border-2 border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none resize-none"
+                  />
+                  <p className="text-xs text-gray-400 mt-3">Press Enter or click Next to continue. Leave blank to skip.</p>
+                </TypeformScreen>
+              )}
+
+              {/* ─── Screen 5: Assets ─── */}
+              {screen === 5 && (
+                <TypeformScreen
+                  screenNum="Step 5 of 6"
+                  title="Got any special assets or access?"
+                  subtitle="Property, equipment, connections — all auction gold"
+                >
+                  <ChipSelector
+                    options={ASSET_OPTIONS}
+                    selected={unified.assets}
+                    onToggle={toggleAsset}
+                    brandColor={brandColor}
+                  />
+                  <div className="mt-6">
+                    <input
+                      type="text"
+                      value={unified.assetsOther || ''}
+                      onChange={e => setUnified(prev => ({ ...prev, assetsOther: e.target.value }))}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Anything else? (e.g., wine cellar, recording studio, season tickets...)"
+                      className="w-full text-center text-sm px-5 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 outline-none"
+                    />
+                  </div>
+                </TypeformScreen>
+              )}
+
+              {/* ─── Screen 6: Optional Bio + Context ─── */}
+              {screen === 6 && (
+                <TypeformScreen
+                  screenNum="Step 6 of 6 — Optional"
+                  title="Anything else we should know?"
+                  subtitle="Paste your LinkedIn bio, or add extra context. Or just hit Discover!"
+                >
+                  <textarea
+                    ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+                    value={unified.socialText || ''}
+                    onChange={e => setUnified(prev => ({ ...prev, socialText: e.target.value }))}
+                    placeholder="Paste your LinkedIn/bio here, or describe anything else about yourself that might inspire great auction items..."
+                    rows={4}
+                    className="w-full text-lg px-6 py-4 rounded-2xl border-2 border-gray-200 text-gray-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none resize-none"
+                  />
+
+                  {error && (
+                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-red-600 mt-3">{error}</motion.p>
+                  )}
+
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleSubmit(false)}
+                    disabled={loading}
+                    className="mt-8 w-full py-4 rounded-2xl text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                    style={{ backgroundColor: brandColor }}
+                  >
+                    <Sparkles className="w-5 h-5" />
+                    Discover My Offerings
+                  </motion.button>
+                </TypeformScreen>
+              )}
+
+              {/* ─── Navigation Buttons ─── */}
+              {screen > 0 && screen < TOTAL_SCREENS && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                  className="text-center"
+                  transition={{ delay: 0.3 }}
+                  className="flex items-center gap-3 mt-10"
                 >
-                  <div className="flex items-center justify-center gap-1 mb-4">
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-700 italic max-w-xl mx-auto leading-relaxed">
-                    "I had no idea my backyard could be worth $2,000 at auction. This tool is incredible."
-                  </p>
-                  <p className="text-xs text-gray-500 mt-2">— Recent donor</p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={goBack}
+                    className="p-3 rounded-xl border border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50 transition-all"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={goNext}
+                    className="px-8 py-3 rounded-xl text-white font-semibold shadow-md hover:shadow-lg transition-all flex items-center gap-2"
+                    style={{ backgroundColor: brandColor }}
+                  >
+                    Next
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.button>
+                  <span className="text-xs text-gray-400 ml-2 hidden sm:inline">or press Enter ↵</span>
                 </motion.div>
-              </div>
+              )}
 
-              {/* Footer */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="absolute bottom-0 left-0 right-0 text-center pb-8 pt-16"
-              >
-                <p className="text-xs text-gray-500">
-                  Built by{' '}
-                  <a href="https://betterworld.org" className="text-emerald-600 hover:text-emerald-700 font-semibold">
-                    betterworld
-                  </a>
-                </p>
-              </motion.div>
-            </motion.div>
-          )}
-
-          {/* ═══ STEP 2: Input Form ═══ */}
-          {step === 'input' && method && (
-            <motion.div key="input" {...pageTransition} className="max-w-2xl mx-auto">
-              <div className="mb-8">
-                <button
-                  onClick={() => setStep('select')}
-                  className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4 transition-colors"
+              {/* Back button on last screen */}
+              {screen === TOTAL_SCREENS && (
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  onClick={goBack}
+                  className="mt-4 text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1.5 transition-colors"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  Back to methods
-                </button>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  {method === 'freetext'
-                    ? 'Tell us about yourself'
-                    : method === 'guided'
-                    ? 'Quick questions'
-                    : 'Share your bio'}
-                </h2>
-                <p className="text-gray-600">We use this to find your perfect offerings.</p>
-              </div>
-
-              <motion.div
-                variants={stagger}
-                initial="initial"
-                animate="animate"
-                className="space-y-6 mb-8"
-              >
-                {method === 'freetext' && (
-                  <>
-                    <InputField
-                      label="Tell us about yourself"
-                      placeholder="Share what you do, your passions, skills, and experiences. The more detail, the better we can help..."
-                      value={freetext}
-                      onChange={setFreetext}
-                      multiline
-                    />
-                    {freetext.toLowerCase().includes('magic') && (
-                      <motion.p
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="text-xs text-purple-600 flex items-center gap-1.5"
-                      >
-                        <Sparkles className="w-3.5 h-3.5" />
-                        Ooh, magic? We love a good magician at auctions!
-                      </motion.p>
-                    )}
-                  </>
-                )}
-
-                {method === 'guided' && (
-                  <>
-                    <motion.div variants={fadeUp}>
-                      <label className="block text-sm font-semibold text-gray-900 mb-2">
-                        What type of donor are you?
-                      </label>
-                      <select
-                        value={donorType}
-                        onChange={(e) => setDonorType(e.target.value as DonorType)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 text-sm transition-all focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100"
-                      >
-                        <option value="individual">Individual Donor</option>
-                        <option value="business">Business Owner</option>
-                      </select>
-                    </motion.div>
-
-                    <InputField
-                      label="What's your profession or main occupation?"
-                      placeholder="e.g., Software engineer, Marketing manager, Yoga instructor..."
-                      value={guided.profession || ''}
-                      onChange={(v) => updateGuided('profession', v)}
-                    />
-
-                    <InputField
-                      label="What are your hobbies or interests?"
-                      placeholder="e.g., Photography, cooking, gardening, travel..."
-                      value={guided.hobbies || ''}
-                      onChange={(v) => updateGuided('hobbies', v)}
-                    />
-
-                    <InputField
-                      label="Any special skills or talents?"
-                      placeholder="e.g., Speaking, consulting, mentoring, teaching..."
-                      value={guided.skills || ''}
-                      onChange={(v) => updateGuided('skills', v)}
-                    />
-                  </>
-                )}
-
-                {method === 'social' && (
-                  <>
-                    <InputField
-                      label="Paste your bio"
-                      placeholder="Copy and paste your LinkedIn profile, website bio, or similar..."
-                      value={socialText}
-                      onChange={setSocialText}
-                      multiline
-                    />
-                  </>
-                )}
-
-                <InputField
-                  label="Anything about the organization or event?"
-                  placeholder="e.g., 'We're raising funds for a local school gala' (optional)"
-                  value={nonprofitContext}
-                  onChange={setNonprofitContext}
-                />
-
-                {error && (
-                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-red-600">
-                    {error}
-                  </motion.p>
-                )}
-
-                <motion.button
-                  variants={fadeUp}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  onClick={() => handleSubmit(false)}
-                  disabled={loading}
-                  className="w-full py-4 rounded-xl text-white font-semibold disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg"
-                  style={{ backgroundColor: brandColor || '#059669' }}
-                >
-                  {loading ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Discovering offerings...</>
-                  ) : (
-                    <><Sparkles className="w-4 h-4" /> Discover Offerings</>
-                  )}
+                  Back
                 </motion.button>
-              </motion.div>
-
-              {loading && <LoadingState isMore={false} />}
+              )}
             </motion.div>
           )}
 
-          {/* ═══ STEP 3: Results ═══ */}
-          {step === 'results' && (
-            <motion.div key="results" {...pageTransition} ref={resultsRef}>
+          {/* ═══ RESULTS ═══ */}
+          {!loading && phase === 'results' && (
+            <motion.div key="results" {...pageTransition} className="max-w-5xl mx-auto px-4 py-8 pb-32 w-full" ref={resultsRef}>
               <motion.div
                 initial={{ opacity: 1 }}
                 animate={{ opacity: 0 }}
@@ -1126,6 +1234,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                   🎉
                 </motion.span>
               </motion.div>
+
               <div className="mb-10 flex items-end justify-between">
                 <div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">Your personalized offerings</h2>
@@ -1152,7 +1261,6 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                 </button>
               </div>
 
-              {/* Donor Summary */}
               {donorSummary && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -1164,13 +1272,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                 </motion.div>
               )}
 
-              {/* Suggestions Grid */}
-              <motion.div
-                variants={stagger}
-                initial="initial"
-                animate="animate"
-                className="space-y-4 mb-10"
-              >
+              <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-4 mb-10">
                 {allSuggestions.map((item, i) => (
                   <SuggestionCard
                     key={i}
@@ -1183,13 +1285,8 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                 ))}
               </motion.div>
 
-              {/* Brainstorm More Button */}
               {!loadingMore && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex gap-4 justify-center mb-10"
-                >
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4 justify-center mb-10">
                   <motion.button
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
@@ -1201,14 +1298,13 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       <Lightbulb className="w-4 h-4" /> Get more ideas
                     </span>
                   </motion.button>
-
                   <motion.button
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     onClick={() => setShowShareModal(true)}
                     disabled={selectedItems.length === 0}
                     className="px-6 py-3 rounded-xl text-white font-semibold transition-all flex items-center gap-2 shadow-lg disabled:opacity-50"
-                    style={{ backgroundColor: brandColor || '#059669' }}
+                    style={{ backgroundColor: brandColor }}
                   >
                     <Send className="w-4 h-4" />
                     Share {selectedItems.length > 0 && `(${selectedItems.length})`}
@@ -1218,7 +1314,6 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
 
               {loadingMore && <LoadingState isMore={true} />}
 
-              {/* Share Modal */}
               <AnimatePresence>
                 {showShareModal && (
                   <ShareModal
@@ -1235,6 +1330,23 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
           )}
         </AnimatePresence>
       </main>
+
+      {/* Footer */}
+      {phase === 'flow' && screen === 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="text-center pb-8 pt-4"
+        >
+          <p className="text-xs text-gray-500">
+            Built by{' '}
+            <a href="https://betterworld.org" className="text-emerald-600 hover:text-emerald-700 font-semibold">
+              betterworld
+            </a>
+          </p>
+        </motion.div>
+      )}
     </div>
   );
 }

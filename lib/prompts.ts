@@ -1,4 +1,4 @@
-import { DonorInput, GuidedAnswers } from './types';
+import { DonorInput, GuidedAnswers, UnifiedAnswers } from './types';
 
 function buildGuidedContext(g: GuidedAnswers): string {
   if (g.donorType === 'individual') {
@@ -16,6 +16,46 @@ function buildGuidedContext(g: GuidedAnswers): string {
 - Physical Space / Venue Capabilities: ${g.physicalSpace || 'Not specified'}
 - Team Expertise & Specialties: ${g.teamExpertise || 'Not specified'}
 - Products or Inventory Available: ${g.inventoryOrProducts || 'Not specified'}`;
+}
+
+function buildUnifiedContext(u: UnifiedAnswers): string {
+  const lines: string[] = [];
+
+  if (u.donorType === 'individual') {
+    lines.push('INDIVIDUAL PROFILE:');
+    if (u.occupation) lines.push(`- Occupation / Profession: ${u.occupation}`);
+  } else {
+    lines.push('BUSINESS PROFILE:');
+    if (u.businessName) lines.push(`- Business Name: ${u.businessName}`);
+    if (u.industry) lines.push(`- Industry: ${u.industry}`);
+    if (u.occupation) lines.push(`- Role / Title: ${u.occupation}`);
+  }
+
+  const allInterests = [
+    ...(u.interests || []),
+    ...(u.interestsOther ? [u.interestsOther] : []),
+  ];
+  if (allInterests.length > 0) {
+    lines.push(`- Interests & Hobbies: ${allInterests.join(', ')}`);
+  }
+
+  if (u.hiddenTalents) {
+    lines.push(`- Hidden Talents & Special Skills: ${u.hiddenTalents}`);
+  }
+
+  const allAssets = [
+    ...(u.assets || []),
+    ...(u.assetsOther ? [u.assetsOther] : []),
+  ];
+  if (allAssets.length > 0) {
+    lines.push(`- Notable Assets & Access: ${allAssets.join(', ')}`);
+  }
+
+  if (u.socialText) {
+    lines.push(`\nADDITIONAL BIO / PROFILE INFO:\n${u.socialText}`);
+  }
+
+  return lines.join('\n');
 }
 
 export function buildSystemPrompt(): string {
@@ -164,6 +204,9 @@ export function buildUserPrompt(input: DonorInput): string {
       break;
     case 'social':
       context = `PROFILE (from social media / LinkedIn):\n${input.socialText}`;
+      break;
+    case 'unified':
+      context = input.unified ? buildUnifiedContext(input.unified) : 'No details provided';
       break;
   }
 
