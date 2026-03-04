@@ -758,7 +758,7 @@ export default function Home() {
               </div>
               <div>
                 <p className="text-white font-semibold text-lg">One coffee shop. Three creative offerings.</p>
-                <p className="text-gray-400 text-sm">$75 in basic donations → $1,200 in auction value</p>
+                <p className="text-gray-400 text-sm">$75 in basic donations → $1,200 in auction value — <span className="text-emerald-400 font-semibold">16x more</span></p>
               </div>
             </div>
             <button
