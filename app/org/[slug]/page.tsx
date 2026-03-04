@@ -294,77 +294,76 @@ function SuggestionCard({
    Loading State
    ═══════════════════════════════════════════════ */
 function LoadingState({ isMore }: { isMore: boolean }) {
-  const messages = isMore
-    ? [
-        { text: 'Finding fresh ideas...', emoji: '💡' },
-        { text: 'Thinking outside the box...', emoji: '📦' },
-        { text: 'Brainstorming...', emoji: '🧠' },
-      ]
-    : [
-        { text: 'Getting to know you...', emoji: '👋' },
-        { text: 'Discovering hidden gems...', emoji: '💎' },
-        { text: 'Matching your skills to ideas...', emoji: '🎯' },
-        { text: 'Crafting personalized offerings...', emoji: '✨' },
-        { text: 'Polishing the final touches...', emoji: '💫' },
-      ];
+  const steps = [
+    { text: 'Getting to know you', emoji: '👋', detail: 'Reading your unique profile' },
+    { text: 'Discovering hidden gems', emoji: '💎', detail: 'Searching for creative matches' },
+    { text: 'Matching your skills to ideas', emoji: '🎯', detail: 'Connecting dots you might not see' },
+    { text: 'Crafting personalized offerings', emoji: '✨', detail: 'Tailoring each suggestion' },
+    { text: 'Polishing the final touches', emoji: '💫', detail: 'Making everything shine' },
+  ];
+  const moreMessages = [
+    { text: 'Finding fresh ideas...', emoji: '💡' },
+    { text: 'Thinking outside the box...', emoji: '📦' },
+    { text: 'Brainstorming...', emoji: '🧠' },
+  ];
+  const funFacts = [
+    'Silent auctions raise 2-3x more than traditional fundraisers',
+    'Experiences & services often outperform physical items at auction',
+    'Unique, personal offerings create the most bidding excitement',
+    'The best auction items tell a story about the donor',
+    'Donors who contribute skills often become repeat supporters',
+  ];
+
   const [msgIdx, setMsgIdx] = useState(0);
+  const [activeStep, setActiveStep] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [factIdx, setFactIdx] = useState(0);
 
   useEffect(() => {
-    const timer = setInterval(() => setMsgIdx(i => (i + 1) % messages.length), 2400);
-    return () => clearInterval(timer);
-  }, [messages.length]);
+    if (isMore) {
+      const timer = setInterval(() => setMsgIdx(i => (i + 1) % moreMessages.length), 2400);
+      return () => clearInterval(timer);
+    }
+  }, [isMore, moreMessages.length]);
 
   useEffect(() => {
     if (isMore) return;
     const start = Date.now();
-    const duration = 15000;
+    const duration = 18000;
     const tick = () => {
       const elapsed = Date.now() - start;
       const pct = Math.min(95, (elapsed / duration) * 100);
       setProgress(pct);
+      // Advance step based on progress
+      const stepIndex = Math.min(steps.length - 1, Math.floor((pct / 95) * steps.length));
+      setActiveStep(stepIndex);
       if (pct < 95) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-  }, [isMore]);
+  }, [isMore, steps.length]);
 
-  return (
-    <motion.div {...pageTransition} className="max-w-md mx-auto text-center py-20">
-      <motion.div
-        className="w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mx-auto mb-8 shadow-lg shadow-emerald-200/40"
-        animate={{ scale: [1, 1.05, 1], rotate: [0, 5, -5, 0] }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <Sparkles className="w-10 h-10 text-white" />
-      </motion.div>
+  // Rotate fun facts
+  useEffect(() => {
+    if (isMore) return;
+    const timer = setInterval(() => setFactIdx(i => (i + 1) % funFacts.length), 4000);
+    return () => clearInterval(timer);
+  }, [isMore, funFacts.length]);
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={msgIdx}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="mb-3"
-        >
-          <span className="text-2xl mb-1 block">{messages[msgIdx].emoji}</span>
-          <p className="text-lg font-medium text-gray-800">{messages[msgIdx].text}</p>
-        </motion.div>
-      </AnimatePresence>
-
-      {!isMore && (
-        <div className="mt-8 max-w-xs mx-auto">
-          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full"
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-            />
-          </div>
-          <p className="text-xs text-gray-400 mt-3">Our AI is working its magic</p>
-        </div>
-      )}
-
-      {isMore && (
+  if (isMore) {
+    return (
+      <motion.div {...pageTransition} className="max-w-md mx-auto text-center py-12">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={msgIdx}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="mb-3"
+          >
+            <span className="text-2xl mb-1 block">{moreMessages[msgIdx].emoji}</span>
+            <p className="text-lg font-medium text-gray-800">{moreMessages[msgIdx].text}</p>
+          </motion.div>
+        </AnimatePresence>
         <div className="flex justify-center gap-2 mt-6">
           {[0, 1, 2].map(i => (
             <motion.div
@@ -375,7 +374,86 @@ function LoadingState({ isMore }: { isMore: boolean }) {
             />
           ))}
         </div>
-      )}
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div {...pageTransition} className="max-w-lg mx-auto text-center py-16 px-4">
+      {/* Animated icon */}
+      <motion.div
+        className="w-24 h-24 rounded-3xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center mx-auto mb-10 shadow-xl shadow-emerald-200/50"
+        animate={{ scale: [1, 1.06, 1], rotate: [0, 3, -3, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <Sparkles className="w-12 h-12 text-white" />
+      </motion.div>
+
+      {/* Current step text */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeStep}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.4 }}
+          className="mb-8"
+        >
+          <span className="text-3xl mb-2 block">{steps[activeStep].emoji}</span>
+          <p className="text-xl font-semibold text-navy-900">{steps[activeStep].text}</p>
+          <p className="text-sm text-gray-500 mt-1">{steps[activeStep].detail}</p>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Step indicators */}
+      <div className="flex items-center justify-center gap-2 mb-8">
+        {steps.map((_, i) => (
+          <motion.div
+            key={i}
+            className="rounded-full"
+            animate={{
+              width: i === activeStep ? 24 : 8,
+              height: 8,
+              backgroundColor: i <= activeStep ? '#10b981' : '#e5e7eb',
+            }}
+            transition={{ duration: 0.3 }}
+          />
+        ))}
+      </div>
+
+      {/* Progress bar */}
+      <div className="max-w-xs mx-auto mb-8">
+        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+          <motion.div
+            className="h-full bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-400 rounded-full"
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            style={{ backgroundSize: '200% 100%' }}
+          />
+        </div>
+      </div>
+
+      {/* Fun fact ticker */}
+      <motion.div
+        className="bg-cream-50 border border-cream-200 rounded-2xl px-6 py-4 max-w-sm mx-auto"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1 }}
+      >
+        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Did you know?</p>
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={factIdx}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3 }}
+            className="text-sm text-gray-600 leading-relaxed"
+          >
+            {funFacts[factIdx]}
+          </motion.p>
+        </AnimatePresence>
+      </motion.div>
     </motion.div>
   );
 }
@@ -520,6 +598,12 @@ function ShareModal({
 function ThankYouPage({ orgName, orgSlug, brandColor }: { orgName: string; orgSlug: string; brandColor: string }) {
   const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/org/${orgSlug}` : '';
   const [copied, setCopied] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowConfetti(false), 4000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const copyLink = () => {
     navigator.clipboard.writeText(shareUrl);
@@ -527,87 +611,98 @@ function ThankYouPage({ orgName, orgSlug, brandColor }: { orgName: string; orgSl
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const shareText = `I just discovered creative auction items I can donate to ${orgName} using What Could I Offer! Try it yourself:`;
+  const shareText = `I just discovered creative auction items I can donate to ${orgName} using DonorSpark! Try it yourself:`;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
-      className="max-w-lg mx-auto text-center py-16 px-4"
-    >
+    <>
+      {showConfetti && <ConfettiBurst />}
       <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: [0, 1.3, 1] }}
-        transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] as const }}
-        className="text-6xl mb-6"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
+        className="max-w-lg mx-auto text-center py-16 px-4"
       >
-        🎉
-      </motion.div>
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: [0, 1.4, 1] }}
+          transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] as const }}
+          className="text-7xl mb-6"
+        >
+          🎉
+        </motion.div>
 
-      <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="text-3xl font-bold text-navy-900 mb-3 tracking-tight"
-      >
-        Thank you!
-      </motion.h2>
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="text-4xl font-bold text-navy-900 mb-3 tracking-tight"
+        >
+          You&apos;re amazing!
+        </motion.h2>
 
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="text-gray-600 text-lg mb-10 leading-relaxed"
-      >
-        Your offerings have been shared with <span className="font-semibold text-navy-900">{orgName}</span>. You&apos;re making a real difference.
-      </motion.p>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="text-gray-600 text-lg mb-10 leading-relaxed"
+        >
+          Your offerings have been shared with <span className="font-semibold text-navy-900">{orgName}</span>. You&apos;re making a real difference.
+        </motion.p>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="bg-gray-50 rounded-3xl p-8 border border-gray-200/50 mb-8"
-      >
-        <div className="flex items-center justify-center gap-2 mb-3">
-          <Heart className="w-5 h-5 text-rose-500" />
-          <h3 className="text-lg font-semibold text-navy-900">Share with a friend to do more good</h3>
-        </div>
-        <p className="text-sm text-gray-500 mb-6">Know someone who might have something amazing to offer? Pass it along!</p>
-
-        <div className="flex flex-col sm:flex-row gap-3">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={copyLink}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-gray-200 hover:border-gray-300 text-navy-900 font-medium text-sm transition-all"
+        {/* Share with a friend section */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="bg-gradient-to-b from-white to-cream-50 rounded-3xl p-8 border border-gray-200/60 shadow-sm mb-8"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 15 }}
+            className="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center mx-auto mb-4"
           >
-            {copied ? <><Check className="w-4 h-4 text-emerald-500" /> Copied!</> : <><Copy className="w-4 h-4" /> Copy link</>}
-          </motion.button>
-          <motion.a
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            href={`mailto:?subject=You should try this!&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white font-medium text-sm transition-all shadow-md"
-            style={{ backgroundColor: brandColor }}
-          >
-            <Mail className="w-4 h-4" /> Email a friend
-          </motion.a>
-        </div>
-      </motion.div>
+            <Heart className="w-7 h-7 text-rose-500" />
+          </motion.div>
+          <h3 className="text-xl font-bold text-navy-900 mb-2">Double your impact</h3>
+          <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
+            Know someone who might have something amazing to offer? Invite them to discover what they could contribute!
+          </p>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.7 }}
-        className="flex items-center justify-center gap-1.5 text-xs text-gray-400"
-      >
-        Powered by{' '}
-        <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer">
-          <img src="https://betterworld.org/assets/brand/wordmark-denim.svg" alt="BetterWorld" className="h-3 w-auto" draggable={false} />
-        </a>
+          <div className="flex flex-col gap-3">
+            <motion.a
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              href={`mailto:?subject=You should try this!&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`}
+              className="flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-2xl text-white font-semibold text-sm transition-all shadow-lg hover:shadow-xl"
+              style={{ backgroundColor: brandColor }}
+            >
+              <Mail className="w-4.5 h-4.5" /> Email a friend
+            </motion.a>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={copyLink}
+              className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl border-2 border-gray-200 hover:border-gray-300 text-navy-900 font-medium text-sm transition-all bg-white"
+            >
+              {copied ? <><Check className="w-4 h-4 text-emerald-500" /> Link copied!</> : <><Copy className="w-4 h-4" /> Copy link to share</>}
+            </motion.button>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9 }}
+          className="flex items-center justify-center gap-1.5 text-xs text-gray-400"
+        >
+          Powered by{' '}
+          <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer">
+            <img src="https://betterworld.org/assets/brand/wordmark-denim.svg" alt="BetterWorld" className="h-3 w-auto" draggable={false} />
+          </a>
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </>
   );
 }
 
@@ -1427,29 +1522,46 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
               </motion.div>
 
               {!loadingMore && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4 justify-center mb-10">
-                  <motion.button
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
-                    onClick={() => handleSubmit(true)}
-                    disabled={loadingMore}
-                    className="px-6 py-3 rounded-xl border-2 border-gray-300 text-navy-900 font-semibold transition-all hover:border-emerald-400 hover:text-emerald-700"
-                  >
-                    <span className="flex items-center gap-2">
-                      <Lightbulb className="w-4 h-4" /> Get more ideas
-                    </span>
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
-                    onClick={() => setShowShareModal(true)}
-                    disabled={selectedItems.length === 0}
-                    className="px-6 py-3 rounded-xl text-white font-semibold transition-all flex items-center gap-2 shadow-lg disabled:opacity-50"
-                    style={{ backgroundColor: brandColor }}
-                  >
-                    <Send className="w-4 h-4" />
-                    Share {selectedItems.length > 0 && `(${selectedItems.length})`}
-                  </motion.button>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 mb-10">
+                  <div className="flex gap-4 justify-center">
+                    <motion.button
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
+                      onClick={() => handleSubmit(true)}
+                      disabled={loadingMore}
+                      className="px-6 py-3 rounded-xl border-2 border-gray-300 text-navy-900 font-semibold transition-all hover:border-emerald-400 hover:text-emerald-700"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Lightbulb className="w-4 h-4" /> Get more ideas
+                      </span>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
+                      onClick={() => setShowShareModal(true)}
+                      disabled={selectedItems.length === 0}
+                      className="px-6 py-3 rounded-xl text-white font-semibold transition-all flex items-center gap-2 shadow-lg disabled:opacity-50"
+                      style={{ backgroundColor: brandColor }}
+                    >
+                      <Send className="w-4 h-4" />
+                      Share {selectedItems.length > 0 && `(${selectedItems.length})`}
+                    </motion.button>
+                  </div>
+                  {selectedItems.length === 0 && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                      className="text-center"
+                    >
+                      <button
+                        onClick={() => setPhase('thankyou')}
+                        className="text-sm text-gray-400 hover:text-gray-600 transition-colors underline underline-offset-2"
+                      >
+                        Just browsing? Finish up
+                      </button>
+                    </motion.div>
+                  )}
                 </motion.div>
               )}
 
