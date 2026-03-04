@@ -1,6 +1,6 @@
 export type DonorType = 'individual' | 'business';
 
-export type InputMethod = 'freetext' | 'guided' | 'social';
+export type InputMethod = 'freetext' | 'guided' | 'social' | 'unified';
 
 export interface GuidedAnswers {
   donorType: DonorType;
@@ -19,11 +19,30 @@ export interface GuidedAnswers {
   inventoryOrProducts?: string;
 }
 
+export interface UnifiedAnswers {
+  donorType: DonorType;
+  // Screen 2
+  occupation?: string;
+  businessName?: string;
+  industry?: string;
+  // Screen 3
+  interests: string[];
+  interestsOther?: string;
+  // Screen 4
+  hiddenTalents?: string;
+  // Screen 5
+  assets: string[];
+  assetsOther?: string;
+  // Screen 6
+  socialText?: string;
+}
+
 export interface DonorInput {
   method: InputMethod;
   freetext?: string;
   guided?: GuidedAnswers;
   socialText?: string;
+  unified?: UnifiedAnswers;
   nonprofitContext?: string;
   previousSuggestions?: string[]; // titles of already-suggested items to avoid repeats
 }
