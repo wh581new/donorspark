@@ -517,15 +517,17 @@ export default function Home() {
             <div className="w-8 h-8 bg-navy-900 rounded-lg flex items-center justify-center">
               <Gift className="w-4 h-4 text-white" />
             </div>
-            <span className="font-semibold text-navy-900 text-[15px] tracking-tight">
-              What Could I Offer?
-            </span>
+            <div className="flex flex-col">
+              <span className="font-semibold text-navy-900 text-[15px] tracking-tight leading-tight">
+                What Could I Offer?
+              </span>
+              <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] text-gray-400 hover:text-gray-600 transition-colors leading-tight">
+                by
+                <BetterWorldLogo className="h-2.5 w-auto" color="#9ca3af" />
+              </a>
+            </div>
           </div>
-          <div className="flex items-center gap-6">
-            <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer" className="hidden sm:flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors">
-              by
-              <BetterWorldLogo className="h-3.5 w-auto" color="#9ca3af" />
-            </a>
+          <div className="flex items-center">
             <button
               onClick={scrollToForm}
               className="bg-navy-900 hover:bg-navy-800 text-white text-sm font-medium px-5 py-2 rounded-full transition-colors"
