@@ -21,6 +21,10 @@ import {
   Upload,
   X,
   Image as ImageIcon,
+  Coffee,
+  DollarSign,
+  TrendingUp,
+  Sparkles,
 } from 'lucide-react'
 
 /* ────────────────────────────────────────────────
@@ -55,6 +59,192 @@ const PRODUCT_IMAGES = [
   'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=800&q=80&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=800&q=80&auto=format&fit=crop',
 ]
+
+/* ────────────────────────────────────────────────
+   Before/After coffee shop examples
+   ──────────────────────────────────────────────── */
+const BEFORE_AFTER_EXAMPLES = [
+  {
+    before: {
+      title: '$25 Gift Card',
+      amount: 25,
+      emoji: '🎁',
+      desc: 'Generic gift card donation',
+      img: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&q=80&auto=format&fit=crop',
+    },
+    after: {
+      title: 'Free Drip Coffee for a Year',
+      amount: 200,
+      emoji: '☕',
+      desc: 'Costs the shop ~$40 in beans, raises 8x more',
+      img: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80&auto=format&fit=crop',
+    },
+    multiplier: '8x',
+  },
+  {
+    before: {
+      title: '$25 Gift Card',
+      amount: 25,
+      emoji: '🎁',
+      desc: 'Another generic gift card',
+      img: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&q=80&auto=format&fit=crop',
+    },
+    after: {
+      title: 'Afternoon Tea Baby Shower',
+      amount: 600,
+      emoji: '🫖',
+      desc: 'Private event space + catering for 12 guests',
+      img: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80&auto=format&fit=crop',
+    },
+    multiplier: '24x',
+  },
+  {
+    before: {
+      title: '$25 Gift Card',
+      amount: 25,
+      emoji: '🎁',
+      desc: 'Same old gift card',
+      img: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&q=80&auto=format&fit=crop',
+    },
+    after: {
+      title: 'Name the Drink of the Month',
+      amount: 400,
+      emoji: '💕',
+      desc: 'Name a signature drink after someone you love',
+      img: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefda?w=600&q=80&auto=format&fit=crop',
+    },
+    multiplier: '16x',
+  },
+]
+
+/* ────────────────────────────────────────────────
+   Before/After Card Component
+   ──────────────────────────────────────────────── */
+function BeforeAfterCard({ example, index }: { example: typeof BEFORE_AFTER_EXAMPLES[0]; index: number }) {
+  const [sliderPos, setSliderPos] = useState(50)
+  const [isDragging, setIsDragging] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const handleMove = (clientX: number) => {
+    if (!containerRef.current) return
+    const rect = containerRef.current.getBoundingClientRect()
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width))
+    setSliderPos((x / rect.width) * 100)
+  }
+
+  const handleMouseDown = () => setIsDragging(true)
+
+  useEffect(() => {
+    const handleMouseUp = () => setIsDragging(false)
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging) handleMove(e.clientX)
+    }
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDragging) handleMove(e.touches[0].clientX)
+    }
+    window.addEventListener('mouseup', handleMouseUp)
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('touchend', handleMouseUp)
+    window.addEventListener('touchmove', handleTouchMove)
+    return () => {
+      window.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('touchend', handleMouseUp)
+      window.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [isDragging])
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: index * 0.15, ease }}
+      viewport={{ once: true }}
+      className="group"
+    >
+      <div
+        ref={containerRef}
+        className="relative rounded-2xl overflow-hidden cursor-col-resize select-none bg-gray-100 shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-gray-200/60"
+        style={{ height: '340px' }}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleMouseDown}
+      >
+        {/* After (full background) */}
+        <div className="absolute inset-0">
+          <img
+            src={example.after.img}
+            alt={example.after.title}
+            className="w-full h-full object-cover"
+            draggable={false}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/80 via-emerald-900/30 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-2xl">{example.after.emoji}</span>
+              <span className="text-xs font-semibold text-emerald-300 uppercase tracking-wider bg-emerald-500/20 px-2 py-0.5 rounded-full">
+                With WCIO
+              </span>
+            </div>
+            <p className="text-white text-xl font-bold tracking-tight">{example.after.title}</p>
+            <p className="text-emerald-100/80 text-sm mt-1">{example.after.desc}</p>
+            <div className="flex items-center gap-3 mt-3">
+              <span className="text-3xl font-bold text-white">${example.after.amount}</span>
+              <span className="text-emerald-300 text-sm font-semibold bg-emerald-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" />
+                {example.multiplier} more
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Before (clipped) */}
+        <div
+          className="absolute inset-0 overflow-hidden"
+          style={{ width: `${sliderPos}%` }}
+        >
+          <div className="absolute inset-0" style={{ width: `${containerRef.current ? containerRef.current.offsetWidth : 400}px` }}>
+            <img
+              src={example.before.img}
+              alt={example.before.title}
+              className="w-full h-full object-cover"
+              style={{ filter: 'grayscale(30%) brightness(0.85)' }}
+              draggable={false}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/30 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-6">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-2xl">{example.before.emoji}</span>
+                <span className="text-xs font-semibold text-gray-300 uppercase tracking-wider bg-gray-500/30 px-2 py-0.5 rounded-full">
+                  Without WCIO
+                </span>
+              </div>
+              <p className="text-white text-xl font-bold tracking-tight">{example.before.title}</p>
+              <p className="text-gray-300/80 text-sm mt-1">{example.before.desc}</p>
+              <div className="mt-3">
+                <span className="text-3xl font-bold text-white">${example.before.amount}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Slider handle */}
+        <div
+          className="absolute top-0 bottom-0 z-10"
+          style={{ left: `${sliderPos}%`, transform: 'translateX(-50%)' }}
+        >
+          <div className="w-0.5 h-full bg-white/90 shadow-[0_0_12px_rgba(0,0,0,0.3)]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center border-2 border-gray-200 hover:scale-110 transition-transform">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M5 3L2 8L5 13" stroke="#6b7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M11 3L14 8L11 13" stroke="#6b7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -448,73 +638,9 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* ── How it works ── */}
-      <section className="py-28 px-6 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease }}
-            viewport={{ once: true }}
-            className="text-center mb-20"
-          >
-            <p className="text-sm font-medium text-emerald-600 mb-3 tracking-wide uppercase">How it works</p>
-            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
-              Three steps to better auctions
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-            {[
-              {
-                num: '01',
-                icon: Settings,
-                title: 'Create your page',
-                desc: 'Add your organization name, brand color, and a message for your donors. Takes about two minutes.',
-                img: PRODUCT_IMAGES[0],
-              },
-              {
-                num: '02',
-                icon: Share2,
-                title: 'Share with donors',
-                desc: 'Send your custom link via email, social, or embed it on your website. Each org gets a branded page.',
-                img: PRODUCT_IMAGES[1],
-              },
-              {
-                num: '03',
-                icon: Gift,
-                title: 'Collect offerings',
-                desc: 'AI helps donors discover what they can give — from vacation homes to guitar lessons. You review and curate.',
-                img: PRODUCT_IMAGES[2],
-              },
-            ].map((item, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: idx * 0.1, ease }}
-                viewport={{ once: true }}
-                className="group"
-              >
-                <div className="relative rounded-2xl overflow-hidden mb-6 bg-gray-100">
-                  <img
-                    src={item.img}
-                    alt={item.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-gray-900">{item.num}</span>
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 tracking-tight">{item.title}</h3>
-                <p className="text-gray-500 leading-relaxed text-[15px]">{item.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Social proof / features ── */}
+      {/* ══════════════════════════════════════════════
+          SECTION 2: WHY IT WORKS (moved up)
+          ══════════════════════════════════════════════ */}
       <section className="py-28 px-6 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -579,6 +705,136 @@ export default function Home() {
                 ))}
               </div>
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          SECTION 3: BEFORE/AFTER EXAMPLES (NEW)
+          ══════════════════════════════════════════════ */}
+      <section className="py-28 px-6 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease }}
+            viewport={{ once: true }}
+            className="text-center mb-6"
+          >
+            <p className="text-sm font-medium text-emerald-600 mb-3 tracking-wide uppercase">See the difference</p>
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
+              Same coffee shop. Way more impact.
+            </h2>
+          </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1, ease }}
+            viewport={{ once: true }}
+            className="text-center text-gray-500 text-lg max-w-2xl mx-auto mb-16"
+          >
+            A local coffee shop usually donates a $25 gift card. With WCIO, AI helps them discover offerings that raise <span className="text-gray-900 font-semibold">8&ndash;24x more</span> — at almost no extra cost. Drag the slider to compare.
+          </motion.p>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {BEFORE_AFTER_EXAMPLES.map((example, idx) => (
+              <BeforeAfterCard key={idx} example={example} index={idx} />
+            ))}
+          </div>
+
+          {/* Summary bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3, ease }}
+            viewport={{ once: true }}
+            className="mt-12 bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                <Coffee className="w-6 h-6 text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-white font-semibold text-lg">One coffee shop. Three creative offerings.</p>
+                <p className="text-gray-400 text-sm">$75 in gift cards → $1,200 in auction value</p>
+              </div>
+            </div>
+            <button
+              onClick={scrollToForm}
+              className="group bg-white hover:bg-gray-100 text-gray-900 font-medium py-3 px-6 rounded-full transition-all text-sm flex items-center gap-2 flex-shrink-0"
+            >
+              Try it free
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          SECTION 4: HOW IT WORKS
+          ══════════════════════════════════════════════ */}
+      <section className="py-28 px-6 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <p className="text-sm font-medium text-emerald-600 mb-3 tracking-wide uppercase">How it works</p>
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
+              Three steps to better auctions
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+            {[
+              {
+                num: '01',
+                icon: Settings,
+                title: 'Create your page',
+                desc: 'Add your organization name, brand color, and a message for your donors. Takes about two minutes.',
+                img: PRODUCT_IMAGES[0],
+              },
+              {
+                num: '02',
+                icon: Share2,
+                title: 'Share with donors',
+                desc: 'Send your custom link via email, social, or embed it on your website. Each org gets a branded page.',
+                img: PRODUCT_IMAGES[1],
+              },
+              {
+                num: '03',
+                icon: Gift,
+                title: 'Collect offerings',
+                desc: 'AI helps donors discover what they can give — from vacation homes to guitar lessons. You review and curate.',
+                img: PRODUCT_IMAGES[2],
+              },
+            ].map((item, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: idx * 0.1, ease }}
+                viewport={{ once: true }}
+                className="group"
+              >
+                <div className="relative rounded-2xl overflow-hidden mb-6 bg-gray-100">
+                  <img
+                    src={item.img}
+                    alt={item.title}
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center">
+                    <span className="text-sm font-semibold text-gray-900">{item.num}</span>
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2 tracking-tight">{item.title}</h3>
+                <p className="text-gray-500 leading-relaxed text-[15px]">{item.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
