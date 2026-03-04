@@ -112,7 +112,7 @@ const BEFORE_AFTER_EXAMPLES = [
       amount: 400,
       emoji: '💕',
       desc: 'Name a signature drink after someone you love',
-      img: 'https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=600&q=80&auto=format&fit=crop',
+      img: 'https://images.unsplash.com/photo-1534353473418-4cfa6c56fd38?w=600&q=80&auto=format&fit=crop',
     },
     multiplier: '16x',
   },
