@@ -521,9 +521,9 @@ export default function Home() {
               <span className="font-semibold text-navy-900 text-[15px] tracking-tight leading-tight">
                 What Could I Offer?
               </span>
-              <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] text-gray-400 hover:text-gray-600 transition-colors leading-tight">
+              <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-navy-900/60 hover:text-navy-900 transition-colors leading-tight">
                 by
-                <BetterWorldLogo className="h-2.5 w-auto" color="#9ca3af" />
+                <BetterWorldLogo className="h-2 w-auto" color="#1a2640" />
               </a>
             </div>
           </div>
