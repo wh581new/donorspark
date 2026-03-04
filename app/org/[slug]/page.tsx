@@ -293,26 +293,27 @@ function SuggestionCard({
 /* ═══════════════════════════════════════════════
    Loading State
    ═══════════════════════════════════════════════ */
+const LOADING_STEPS = [
+  { text: 'Getting to know you', emoji: '👋', detail: 'Reading your unique profile' },
+  { text: 'Discovering hidden gems', emoji: '💎', detail: 'Searching for creative matches' },
+  { text: 'Matching your skills to ideas', emoji: '🎯', detail: 'Connecting dots you might not see' },
+  { text: 'Crafting personalized offerings', emoji: '✨', detail: 'Tailoring each suggestion' },
+  { text: 'Polishing the final touches', emoji: '💫', detail: 'Making everything shine' },
+];
+const LOADING_MORE_MESSAGES = [
+  { text: 'Finding fresh ideas...', emoji: '💡' },
+  { text: 'Thinking outside the box...', emoji: '📦' },
+  { text: 'Brainstorming...', emoji: '🧠' },
+];
+const FUN_FACTS = [
+  'Silent auctions raise 2-3x more than traditional fundraisers',
+  'Experiences & services often outperform physical items at auction',
+  'Unique, personal offerings create the most bidding excitement',
+  'The best auction items tell a story about the donor',
+  'Donors who contribute skills often become repeat supporters',
+];
+
 function LoadingState({ isMore }: { isMore: boolean }) {
-  const steps = [
-    { text: 'Getting to know you', emoji: '👋', detail: 'Reading your unique profile' },
-    { text: 'Discovering hidden gems', emoji: '💎', detail: 'Searching for creative matches' },
-    { text: 'Matching your skills to ideas', emoji: '🎯', detail: 'Connecting dots you might not see' },
-    { text: 'Crafting personalized offerings', emoji: '✨', detail: 'Tailoring each suggestion' },
-    { text: 'Polishing the final touches', emoji: '💫', detail: 'Making everything shine' },
-  ];
-  const moreMessages = [
-    { text: 'Finding fresh ideas...', emoji: '💡' },
-    { text: 'Thinking outside the box...', emoji: '📦' },
-    { text: 'Brainstorming...', emoji: '🧠' },
-  ];
-  const funFacts = [
-    'Silent auctions raise 2-3x more than traditional fundraisers',
-    'Experiences & services often outperform physical items at auction',
-    'Unique, personal offerings create the most bidding excitement',
-    'The best auction items tell a story about the donor',
-    'Donors who contribute skills often become repeat supporters',
-  ];
 
   const [msgIdx, setMsgIdx] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
@@ -321,10 +322,10 @@ function LoadingState({ isMore }: { isMore: boolean }) {
 
   useEffect(() => {
     if (isMore) {
-      const timer = setInterval(() => setMsgIdx(i => (i + 1) % moreMessages.length), 2400);
+      const timer = setInterval(() => setMsgIdx(i => (i + 1) % LOADING_MORE_MESSAGES.length), 2400);
       return () => clearInterval(timer);
     }
-  }, [isMore, moreMessages.length]);
+  }, [isMore, LOADING_MORE_MESSAGES.length]);
 
   useEffect(() => {
     if (isMore) return;
@@ -335,19 +336,19 @@ function LoadingState({ isMore }: { isMore: boolean }) {
       const pct = Math.min(95, (elapsed / duration) * 100);
       setProgress(pct);
       // Advance step based on progress
-      const stepIndex = Math.min(steps.length - 1, Math.floor((pct / 95) * steps.length));
+      const stepIndex = Math.min(LOADING_STEPS.length - 1, Math.floor((pct / 95) * LOADING_STEPS.length));
       setActiveStep(stepIndex);
       if (pct < 95) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-  }, [isMore, steps.length]);
+  }, [isMore, LOADING_STEPS.length]);
 
   // Rotate fun facts
   useEffect(() => {
     if (isMore) return;
-    const timer = setInterval(() => setFactIdx(i => (i + 1) % funFacts.length), 4000);
+    const timer = setInterval(() => setFactIdx(i => (i + 1) % FUN_FACTS.length), 4000);
     return () => clearInterval(timer);
-  }, [isMore, funFacts.length]);
+  }, [isMore, FUN_FACTS.length]);
 
   if (isMore) {
     return (
@@ -360,8 +361,8 @@ function LoadingState({ isMore }: { isMore: boolean }) {
             exit={{ opacity: 0, y: -10 }}
             className="mb-3"
           >
-            <span className="text-2xl mb-1 block">{moreMessages[msgIdx].emoji}</span>
-            <p className="text-lg font-medium text-gray-800">{moreMessages[msgIdx].text}</p>
+            <span className="text-2xl mb-1 block">{LOADING_MORE_MESSAGES[msgIdx].emoji}</span>
+            <p className="text-lg font-medium text-gray-800">{LOADING_MORE_MESSAGES[msgIdx].text}</p>
           </motion.div>
         </AnimatePresence>
         <div className="flex justify-center gap-2 mt-6">
@@ -399,15 +400,15 @@ function LoadingState({ isMore }: { isMore: boolean }) {
           transition={{ duration: 0.4 }}
           className="mb-8"
         >
-          <span className="text-3xl mb-2 block">{steps[activeStep].emoji}</span>
-          <p className="text-xl font-semibold text-navy-900">{steps[activeStep].text}</p>
-          <p className="text-sm text-gray-500 mt-1">{steps[activeStep].detail}</p>
+          <span className="text-3xl mb-2 block">{LOADING_STEPS[activeStep].emoji}</span>
+          <p className="text-xl font-semibold text-navy-900">{LOADING_STEPS[activeStep].text}</p>
+          <p className="text-sm text-gray-500 mt-1">{LOADING_STEPS[activeStep].detail}</p>
         </motion.div>
       </AnimatePresence>
 
       {/* Step indicators */}
       <div className="flex items-center justify-center gap-2 mb-8">
-        {steps.map((_, i) => (
+        {LOADING_STEPS.map((_, i) => (
           <motion.div
             key={i}
             className="rounded-full"
@@ -450,7 +451,7 @@ function LoadingState({ isMore }: { isMore: boolean }) {
             transition={{ duration: 0.3 }}
             className="text-sm text-gray-600 leading-relaxed"
           >
-            {funFacts[factIdx]}
+            {FUN_FACTS[factIdx]}
           </motion.p>
         </AnimatePresence>
       </motion.div>
@@ -677,7 +678,7 @@ function ThankYouPage({ orgName, orgSlug, brandColor }: { orgName: string; orgSl
               className="flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-2xl text-white font-semibold text-sm transition-all shadow-lg hover:shadow-xl"
               style={{ backgroundColor: brandColor }}
             >
-              <Mail className="w-4.5 h-4.5" /> Email a friend
+              <Mail className="w-5 h-5" /> Email a friend
             </motion.a>
             <motion.button
               whileHover={{ scale: 1.02 }}
