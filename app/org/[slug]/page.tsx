@@ -597,7 +597,7 @@ function ShareModal({
 /* ═══════════════════════════════════════════════
    Thank You Page
    ═══════════════════════════════════════════════ */
-function ThankYouPage({ orgName, orgSlug, brandColor }: { orgName: string; orgSlug: string; brandColor: string }) {
+function ThankYouPage({ orgName, orgSlug, brandColor, didShare = true }: { orgName: string; orgSlug: string; brandColor: string; didShare?: boolean }) {
   const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/org/${orgSlug}` : '';
   const [copied, setCopied] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
@@ -653,7 +653,11 @@ function ThankYouPage({ orgName, orgSlug, brandColor }: { orgName: string; orgSl
           transition={{ delay: 0.4 }}
           className="text-gray-600 text-lg mb-10 leading-relaxed"
         >
-          Your offerings have been shared with <span className="font-semibold text-navy-900">{orgName}</span>. You&apos;re making a real difference.
+          {didShare ? (
+                    <>Your offerings have been shared with <span className="font-semibold text-navy-900">{orgName}</span>. You&apos;re making a real difference.</>
+                  ) : (
+                    <>Thanks for checking out <span className="font-semibold text-navy-900">{orgName}</span>&apos;s auction. Come back anytime to share your offerings!</>
+                  )}
         </motion.p>
 
         {/* Share with a friend section */}
@@ -870,6 +874,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
   const [donorSummary, setDonorSummary] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [showShareModal, setShowShareModal] = useState(false);
+  const [didShare, setDidShare] = useState(false);
   const [logoClicks, setLogoClicks] = useState(0);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
 
@@ -1013,6 +1018,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
     setUnified({ donorType: 'individual', interests: [], assets: [] });
     setNonprofitContext('');
     setSelectedIds(new Set());
+    setDidShare(false);
   };
 
   const selectedItems = Array.from(selectedIds).map(i => allSuggestions[i]);
@@ -1587,7 +1593,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                     orgSlug={org.slug}
                     brandColor={brandColor}
                     onClose={() => setShowShareModal(false)}
-                    onSuccess={() => setPhase('thankyou')}
+                    onSuccess={() => { setDidShare(true); setPhase('thankyou'); }}
                   />
                 )}
               </AnimatePresence>
@@ -1596,7 +1602,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
 
           {/* ═══ THANK YOU ═══ */}
           {phase === 'thankyou' && (
-            <ThankYouPage orgName={org.name} orgSlug={org.slug} brandColor={brandColor} />
+            <ThankYouPage orgName={org.name} orgSlug={org.slug} brandColor={brandColor} didShare={didShare} />
           )}
         </AnimatePresence>
       </main>
