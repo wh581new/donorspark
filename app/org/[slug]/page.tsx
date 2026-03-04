@@ -1378,13 +1378,13 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                 <TypeformScreen
                   screenNum="Step 6 of 6 — Optional"
                   title="Anything else we should know?"
-                  subtitle="Paste your LinkedIn bio, Insta bio, or add extra context. Or just hit Discover!"
+                  subtitle="Paste your LinkedIn, Instagram, or Facebook bio — or just tell us about yourself. Or hit Discover!"
                 >
                   <textarea
                     ref={inputRef as React.RefObject<HTMLTextAreaElement>}
                     value={unified.socialText || ''}
                     onChange={e => setUnified(prev => ({ ...prev, socialText: e.target.value }))}
-                    placeholder="Paste your LinkedIn bio, Insta bio, or anything else about yourself that might inspire great auction items..."
+                    placeholder="Paste your LinkedIn, Instagram, or Facebook bio — or just tell us a bit about yourself..."
                     rows={4}
                     className="w-full text-lg px-6 py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none resize-none"
                   />
