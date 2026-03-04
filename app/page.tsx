@@ -1080,7 +1080,7 @@ export default function Home() {
                 num: '01',
                 icon: Settings,
                 title: 'Create your page',
-                desc: 'Add your organization name, brand color, and a message for your donors. Takes about two minutes.',
+                desc: 'Add your organization name, brand color, and a message for your donors. Takes about 60 seconds.',
                 img: PRODUCT_IMAGES[0],
               },
               {
@@ -1162,7 +1162,7 @@ export default function Home() {
               Get started for free
             </h2>
             <p className="text-gray-500 text-lg">
-              Set up your organization in under 2 minutes.
+              Set up your organization in under 60 seconds.
             </p>
           </motion.div>
 
