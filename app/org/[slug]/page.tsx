@@ -1017,7 +1017,12 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
   const selectedItems = Array.from(selectedIds).map(i => allSuggestions[i]);
   const hiddenGemsCount = allSuggestions.filter(s => s.isHiddenGem).length;
 
-  const progressPercent = phase === 'results' ? 100 : Math.round((screen / TOTAL_SCREENS) * 100);
+  // Progress: form screens fill to ~85%, loading/AI phase shows 92%, results = 100%
+  const progressPercent = phase === 'results'
+    ? 100
+    : loading
+      ? 92
+      : Math.round((screen / TOTAL_SCREENS) * 85);
 
   // ─── Loading org ───
   if (orgLoading) {
