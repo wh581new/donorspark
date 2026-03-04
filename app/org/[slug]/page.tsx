@@ -1178,9 +1178,9 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-12"
                     >
                       {org.message ? (
-                        <>{org.message} Answer a few quick questions and we&apos;ll find creative auction items you can contribute.</>
+                        <>{org.message} Answer a few quick questions and we&apos;ll uncover creative auction item ideas you could offer that help raise more!</>
                       ) : (
-                        <>Help {org.name} plan an amazing auction — answer a few quick questions and we&apos;ll find creative items you can contribute.</>
+                        <>Help {org.name} plan an amazing auction — answer a few quick questions and we&apos;ll uncover creative auction item ideas you could offer that help raise more!</>
                       )}
                     </motion.p>
 
@@ -1211,7 +1211,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                         ))}
                       </div>
                       <p className="text-sm text-gray-700 italic max-w-xl mx-auto leading-relaxed">
-                        &ldquo;I had no idea my backyard could be worth $2,000 at auction. This tool is incredible.&rdquo;
+                        &ldquo;I had no idea my backyard could be worth $2,000 at auction. This is incredible.&rdquo;
                       </p>
                       <p className="text-xs text-gray-500 mt-2">&mdash; Recent donor</p>
                     </motion.div>
