@@ -300,7 +300,7 @@ function HeroDemo() {
       {/* Subtle grid pattern */}
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} />
 
-      <div className="relative p-6 sm:p-10 min-h-[360px] sm:min-h-[440px] flex flex-col">
+      <div className="relative p-6 sm:p-10 h-[420px] sm:h-[480px] overflow-hidden">
         {/* Mock browser bar */}
         <div className="flex items-center gap-2 mb-6">
           <div className="flex gap-1.5">
@@ -313,11 +313,11 @@ function HeroDemo() {
           </div>
         </div>
 
-        {/* Input area */}
+        {/* Input area — fixed 2-line height so typing doesn't shift layout */}
         <div className="bg-white/[0.07] backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-5 mb-5">
           <p className="text-white/40 text-xs font-medium uppercase tracking-wider mb-2">Tell us about yourself</p>
           <div className="flex items-center gap-2">
-            <p className="text-white text-base sm:text-lg font-medium flex-1 min-h-[28px]">
+            <p className="text-white text-base sm:text-lg font-medium flex-1 h-[56px] sm:h-[56px] overflow-hidden">
               {displayedText}
               {phase === 'typing' && (
                 <motion.span
@@ -330,79 +330,82 @@ function HeroDemo() {
           </div>
         </div>
 
-        {/* AI thinking indicator */}
-        <AnimatePresence>
-          {phase === 'thinking' && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="flex items-center gap-3 mb-4"
-            >
-              <div className="flex gap-1">
-                {[0, 1, 2].map(i => (
-                  <motion.div
-                    key={i}
-                    animate={{ scale: [1, 1.4, 1], opacity: [0.4, 1, 0.4] }}
-                    transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.2 }}
-                    className="w-2 h-2 rounded-full bg-emerald-400"
-                  />
-                ))}
-              </div>
-              <span className="text-emerald-400/80 text-sm">Discovering auction ideas...</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Suggestion cards */}
-        <div className="flex-1 flex flex-col gap-3">
-          <AnimatePresence mode="popLayout">
-            {(phase === 'results' || phase === 'pause') && profile.suggestions.slice(0, visibleCards).map((s, i) => (
+        {/* Results area — absolute positioned so it never shifts content below the demo */}
+        <div className="absolute left-6 right-6 sm:left-10 sm:right-10 bottom-6 sm:bottom-10 top-[180px] sm:top-[196px] flex flex-col">
+          {/* AI thinking indicator */}
+          <AnimatePresence>
+            {phase === 'thinking' && (
               <motion.div
-                key={`${profileIdx}-${i}`}
-                initial={{ opacity: 0, x: -20, scale: 0.95 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="flex items-center gap-4 bg-white/[0.07] backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-4"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-3 mb-4"
               >
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-xl flex-shrink-0">
-                  {s.emoji}
+                <div className="flex gap-1">
+                  {[0, 1, 2].map(i => (
+                    <motion.div
+                      key={i}
+                      animate={{ scale: [1, 1.4, 1], opacity: [0.4, 1, 0.4] }}
+                      transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.2 }}
+                      className="w-2 h-2 rounded-full bg-emerald-400"
+                    />
+                  ))}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white font-semibold text-sm sm:text-[15px] truncate">{s.title}</p>
-                  <p className="text-white/40 text-xs">Estimated auction value</p>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="text-emerald-400 font-bold text-lg sm:text-xl">${s.value.toLocaleString()}</p>
-                </div>
+                <span className="text-emerald-400/80 text-sm">Discovering auction ideas...</span>
               </motion.div>
-            ))}
+            )}
+          </AnimatePresence>
+
+          {/* Suggestion cards */}
+          <div className="flex-1 flex flex-col gap-3">
+            <AnimatePresence mode="popLayout">
+              {(phase === 'results' || phase === 'pause') && profile.suggestions.slice(0, visibleCards).map((s, i) => (
+                <motion.div
+                  key={`${profileIdx}-${i}`}
+                  initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex items-center gap-4 bg-white/[0.07] backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-4"
+                >
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-xl flex-shrink-0">
+                    {s.emoji}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white font-semibold text-sm sm:text-[15px] truncate">{s.title}</p>
+                    <p className="text-white/40 text-xs">Estimated auction value</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-emerald-400 font-bold text-lg sm:text-xl">${s.value.toLocaleString()}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {/* Total value bar — pinned to bottom of the fixed container */}
+          <AnimatePresence>
+            {totalValue > 0 && (phase === 'results' || phase === 'pause') && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mt-auto pt-4 border-t border-white/10 flex items-center justify-between"
+              >
+                <span className="text-white/50 text-sm font-medium">Total auction value discovered</span>
+                <motion.span
+                  key={totalValue}
+                  initial={{ scale: 1.2 }}
+                  animate={{ scale: 1 }}
+                  className="text-emerald-400 font-bold text-2xl"
+                >
+                  ${totalValue.toLocaleString()}
+                </motion.span>
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
-
-        {/* Total value bar */}
-        <AnimatePresence>
-          {totalValue > 0 && (phase === 'results' || phase === 'pause') && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between"
-            >
-              <span className="text-white/50 text-sm font-medium">Total auction value discovered</span>
-              <motion.span
-                key={totalValue}
-                initial={{ scale: 1.2 }}
-                animate={{ scale: 1 }}
-                className="text-emerald-400 font-bold text-2xl"
-              >
-                ${totalValue.toLocaleString()}
-              </motion.span>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </div>
   )
