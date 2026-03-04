@@ -1166,8 +1166,8 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       animate="animate"
                       className="text-4xl sm:text-6xl font-bold text-navy-900 mb-6 tracking-tight leading-tight"
                     >
-                      You have more to<br />
-                      <span className="text-emerald-600">offer</span>
+                      Uncover your<br />
+                      <span className="text-emerald-600">auction potential</span>
                     </motion.h2>
 
                     <motion.p
