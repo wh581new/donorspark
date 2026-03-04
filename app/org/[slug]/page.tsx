@@ -1156,21 +1156,9 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       transition={{ delay: 0.1, duration: 0.5 }}
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6 bg-emerald-50 text-emerald-700"
                     >
-                      <Gift className="w-4 h-4" />
-                      Discover your auction potential
+                      <Heart className="w-4 h-4" />
+                      Thanks for supporting {org.name}!
                     </motion.div>
-
-                    {org.message && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.15, duration: 0.5 }}
-                        className="max-w-xl mx-auto mb-8 px-5 py-4 rounded-2xl bg-white/80 border border-gray-200 shadow-sm"
-                      >
-                        <p className="text-sm text-gray-500 font-medium mb-1">A message from {org.name}</p>
-                        <p className="text-base text-navy-900 leading-relaxed">{org.message}</p>
-                      </motion.div>
-                    )}
 
                     <motion.h2
                       variants={fadeUp}
@@ -1189,7 +1177,11 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       transition={{ delay: 0.15 }}
                       className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-12"
                     >
-                      Answer a few quick questions and we&apos;ll uncover creative, high-value auction offerings you didn&apos;t know you had.
+                      {org.message ? (
+                        <>{org.message} Answer a few quick questions and we&apos;ll find creative auction items you can contribute.</>
+                      ) : (
+                        <>Help {org.name} plan an amazing auction — answer a few quick questions and we&apos;ll find creative items you can contribute.</>
+                      )}
                     </motion.p>
 
                     <motion.button
