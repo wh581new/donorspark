@@ -1160,6 +1160,18 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       Discover your auction potential
                     </motion.div>
 
+                    {org.message && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.15, duration: 0.5 }}
+                        className="max-w-xl mx-auto mb-8 px-5 py-4 rounded-2xl bg-white/80 border border-gray-200 shadow-sm"
+                      >
+                        <p className="text-sm text-gray-500 font-medium mb-1">A message from {org.name}</p>
+                        <p className="text-base text-navy-900 leading-relaxed">{org.message}</p>
+                      </motion.div>
+                    )}
+
                     <motion.h2
                       variants={fadeUp}
                       initial="initial"
