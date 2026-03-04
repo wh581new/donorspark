@@ -194,13 +194,13 @@ export async function getOrgStats(orgId: string): Promise<{
   let totalValue = 0;
   for (const sub of submissions) {
     for (const offering of sub.offerings) {
-      const match = offering.estimatedValue.match(/\$?([\d,]+)/g);
-      if (match && match.length >= 2) {
-        const low = parseInt(match[0].replace(/[$,]/g, ''));
-        const high = parseInt(match[1].replace(/[$,]/g, ''));
-        totalValue += (low + high) / 2;
-      } else if (match) {
-        totalValue += parseInt(match[0].replace(/[$,]/g, ''));
+      // Parse "$1,500-$2,500" or "$1,500 - $2,500" → midpoint; "$500" → 500
+      const nums = offering.estimatedValue.match(/\$?\s*([\d,]+)/g);
+      if (nums && nums.length > 0) {
+        const parsed = nums.slice(0, 2).map(n => parseInt(n.replace(/[^0-9]/g, ''), 10)).filter(n => !isNaN(n));
+        if (parsed.length > 0) {
+          totalValue += parsed.reduce((a, b) => a + b, 0) / parsed.length;
+        }
       }
     }
   }

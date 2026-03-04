@@ -251,8 +251,13 @@ function SubmissionCard({
 
   const totalValue = submission.offerings.reduce((sum, o) => {
     const valStr = o.estimatedValue || o.value || '0';
-    const val = parseInt(valStr.replace(/[^0-9]/g, ''), 10);
-    return sum + (isNaN(val) ? 0 : val);
+    // Parse "$1,500-$2,500" or "$1,500 - $2,500" → midpoint; "$500" → 500
+    const nums = valStr.match(/\$?\s*([\d,]+)/g);
+    if (!nums || nums.length === 0) return sum;
+    const parsed = nums.slice(0, 2).map(n => parseInt(n.replace(/[^0-9]/g, ''), 10)).filter(n => !isNaN(n));
+    if (parsed.length === 0) return sum;
+    const avg = parsed.reduce((a, b) => a + b, 0) / parsed.length;
+    return sum + avg;
   }, 0);
 
   return (
