@@ -1,18 +1,17 @@
 /**
- * Lightweight JSON-file database for hackathon.
- * Stores orgs and submissions in /tmp (Vercel serverless).
- * Architecture-ready to swap to Postgres/Prisma later.
+ * Persistent KV database for WCIO.
+ * Uses Vercel KV (Upstash Redis) for persistent storage.
+ * Drop-in replacement for the old /tmp filesystem approach.
  */
 
-import { promises as fs } from 'fs';
-import path from 'path';
+import { kv } from '@vercel/kv';
 import { v4 as uuid } from 'uuid';
 
-const DB_DIR = '/tmp/wcio-db';
-const ORGS_FILE = path.join(DB_DIR, 'orgs.json');
-const SUBMISSIONS_FILE = path.join(DB_DIR, 'submissions.json');
+// KV keys
+const ORGS_KEY = 'wcio:orgs';
+const SUBMISSIONS_KEY = 'wcio:submissions';
 
-// ─── Types ───
+// --- Types ---
 
 export interface Org {
   id: string;
@@ -46,29 +45,19 @@ export interface Submission {
   createdAt: string;
 }
 
-// ─── Helpers ───
+// --- KV Helpers ---
 
-async function ensureDir() {
+async function getList<T>(key: string): Promise<T[]> {
   try {
-    await fs.mkdir(DB_DIR, { recursive: true });
-  } catch {
-    // already exists
-  }
-}
-
-async function readJSON<T>(filePath: string): Promise<T[]> {
-  await ensureDir();
-  try {
-    const data = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(data);
+    const data = await kv.get<T[]>(key);
+    return data || [];
   } catch {
     return [];
   }
 }
 
-async function writeJSON<T>(filePath: string, data: T[]): Promise<void> {
-  await ensureDir();
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+async function setList<T>(key: string, data: T[]): Promise<void> {
+  await kv.set(key, data);
 }
 
 function generateSlug(name: string): string {
@@ -85,7 +74,7 @@ function generateToken(): string {
   return uuid().replace(/-/g, '') + uuid().replace(/-/g, '');
 }
 
-// ─── Org Operations ───
+// --- Org Operations ---
 
 export async function createOrg(data: {
   name: string;
@@ -94,13 +83,12 @@ export async function createOrg(data: {
   adminEmail: string;
   brandColor?: string;
 }): Promise<Org> {
-  const orgs = await readJSON<Org>(ORGS_FILE);
+  const orgs = await getList<Org>(ORGS_KEY);
 
   let slug = generateSlug(data.name);
-  // Handle collisions
   let suffix = 1;
   while (orgs.some(o => o.slug === slug)) {
-    slug = `${generateSlug(data.name)}-${suffix}`;
+    slug = generateSlug(data.name) + '-' + suffix;
     suffix++;
   }
 
@@ -111,41 +99,41 @@ export async function createOrg(data: {
     logoUrl: data.logoUrl || null,
     message: data.message,
     adminEmail: data.adminEmail,
-    brandColor: data.brandColor || '#6b8b74', // default sage green
+    brandColor: data.brandColor || '#6b8b74',
     accessToken: generateToken(),
     createdAt: new Date().toISOString(),
   };
 
   orgs.push(org);
-  await writeJSON(ORGS_FILE, orgs);
+  await setList(ORGS_KEY, orgs);
   return org;
 }
 
 export async function getOrgBySlug(slug: string): Promise<Org | null> {
-  const orgs = await readJSON<Org>(ORGS_FILE);
+  const orgs = await getList<Org>(ORGS_KEY);
   return orgs.find(o => o.slug === slug) || null;
 }
 
 export async function getOrgByAccessToken(token: string): Promise<Org | null> {
-  const orgs = await readJSON<Org>(ORGS_FILE);
+  const orgs = await getList<Org>(ORGS_KEY);
   return orgs.find(o => o.accessToken === token) || null;
 }
 
 export async function getOrgById(id: string): Promise<Org | null> {
-  const orgs = await readJSON<Org>(ORGS_FILE);
+  const orgs = await getList<Org>(ORGS_KEY);
   return orgs.find(o => o.id === id) || null;
 }
 
 export async function updateOrg(id: string, updates: Partial<Pick<Org, 'name' | 'logoUrl' | 'message' | 'adminEmail' | 'brandColor'>>): Promise<Org | null> {
-  const orgs = await readJSON<Org>(ORGS_FILE);
+  const orgs = await getList<Org>(ORGS_KEY);
   const idx = orgs.findIndex(o => o.id === id);
   if (idx === -1) return null;
   orgs[idx] = { ...orgs[idx], ...updates };
-  await writeJSON(ORGS_FILE, orgs);
+  await setList(ORGS_KEY, orgs);
   return orgs[idx];
 }
 
-// ─── Submission Operations ───
+// --- Submission Operations ---
 
 export async function createSubmission(data: {
   orgId: string;
@@ -154,7 +142,7 @@ export async function createSubmission(data: {
   donorSummary: string;
   offerings: Submission['offerings'];
 }): Promise<Submission> {
-  const submissions = await readJSON<Submission>(SUBMISSIONS_FILE);
+  const submissions = await getList<Submission>(SUBMISSIONS_KEY);
 
   const submission: Submission = {
     id: uuid(),
@@ -168,32 +156,32 @@ export async function createSubmission(data: {
   };
 
   submissions.push(submission);
-  await writeJSON(SUBMISSIONS_FILE, submissions);
+  await setList(SUBMISSIONS_KEY, submissions);
   return submission;
 }
 
 export async function getSubmissionsByOrg(orgId: string): Promise<Submission[]> {
-  const submissions = await readJSON<Submission>(SUBMISSIONS_FILE);
+  const submissions = await getList<Submission>(SUBMISSIONS_KEY);
   return submissions
     .filter(s => s.orgId === orgId)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 export async function getSubmissionById(id: string): Promise<Submission | null> {
-  const submissions = await readJSON<Submission>(SUBMISSIONS_FILE);
+  const submissions = await getList<Submission>(SUBMISSIONS_KEY);
   return submissions.find(s => s.id === id) || null;
 }
 
 export async function updateSubmissionStatus(id: string, status: Submission['status']): Promise<Submission | null> {
-  const submissions = await readJSON<Submission>(SUBMISSIONS_FILE);
+  const submissions = await getList<Submission>(SUBMISSIONS_KEY);
   const idx = submissions.findIndex(s => s.id === id);
   if (idx === -1) return null;
   submissions[idx].status = status;
-  await writeJSON(SUBMISSIONS_FILE, submissions);
+  await setList(SUBMISSIONS_KEY, submissions);
   return submissions[idx];
 }
 
-// ─── Stats ───
+// --- Stats ---
 
 export async function getOrgStats(orgId: string): Promise<{
   totalSubmissions: number;
@@ -205,17 +193,16 @@ export async function getOrgStats(orgId: string): Promise<{
   const totalOfferings = submissions.reduce((sum, s) => sum + s.offerings.length, 0);
   const newSubmissions = submissions.filter(s => s.status === 'new').length;
 
-  // Parse estimated values (take midpoint of ranges like "$200-$400")
   let totalValue = 0;
   for (const sub of submissions) {
     for (const offering of sub.offerings) {
       const match = offering.estimatedValue.match(/\$?([\d,]+)/g);
       if (match && match.length >= 2) {
-        const low = parseInt(match[0].replace(/[$,]/g, ''));
-        const high = parseInt(match[1].replace(/[$,]/g, ''));
+        const low = parseInt(match[0].replace(/[\$,]/g, ''));
+        const high = parseInt(match[1].replace(/[\$,]/g, ''));
         totalValue += (low + high) / 2;
       } else if (match) {
-        totalValue += parseInt(match[0].replace(/[$,]/g, ''));
+        totalValue += parseInt(match[0].replace(/[\$,]/g, ''));
       }
     }
   }
@@ -224,6 +211,6 @@ export async function getOrgStats(orgId: string): Promise<{
     totalSubmissions: submissions.length,
     totalOfferings,
     newSubmissions,
-    estimatedValue: `$${Math.round(totalValue).toLocaleString()}`,
+    estimatedValue: '$' + Math.round(totalValue).toLocaleString(),
   };
 }
