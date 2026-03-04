@@ -84,11 +84,11 @@ const BEFORE_AFTER_EXAMPLES = [
   },
   {
     before: {
-      title: '$25 Gift Card',
+      title: '3 Bags of Coffee',
       amount: 25,
-      emoji: '🎁',
-      desc: 'Another generic gift card',
-      img: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&q=80&auto=format&fit=crop',
+      emoji: '☕',
+      desc: 'A few bags of house blend',
+      img: 'https://images.unsplash.com/photo-1559525839-b184a4d698c7?w=600&q=80&auto=format&fit=crop',
     },
     after: {
       title: 'Afternoon Tea Baby Shower',
@@ -101,11 +101,11 @@ const BEFORE_AFTER_EXAMPLES = [
   },
   {
     before: {
-      title: '$25 Gift Card',
+      title: 'Set of Two Mugs',
       amount: 25,
-      emoji: '🎁',
-      desc: 'Same old gift card',
-      img: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&q=80&auto=format&fit=crop',
+      emoji: '☕',
+      desc: 'A pair of branded coffee mugs',
+      img: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&q=80&auto=format&fit=crop',
     },
     after: {
       title: 'Name the Drink of the Month',
@@ -183,7 +183,7 @@ function BeforeAfterCard({ example, index }: { example: typeof BEFORE_AFTER_EXAM
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">{example.after.emoji}</span>
               <span className="text-xs font-semibold text-emerald-300 uppercase tracking-wider bg-emerald-500/20 px-2 py-0.5 rounded-full">
-                With WCIO
+                With DonorSpark
               </span>
             </div>
             <p className="text-white text-xl font-bold tracking-tight">{example.after.title}</p>
@@ -216,7 +216,7 @@ function BeforeAfterCard({ example, index }: { example: typeof BEFORE_AFTER_EXAM
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-2xl">{example.before.emoji}</span>
                 <span className="text-xs font-semibold text-gray-300 uppercase tracking-wider bg-gray-500/30 px-2 py-0.5 rounded-full">
-                  Without WCIO
+                  Without DonorSpark
                 </span>
               </div>
               <p className="text-white text-xl font-bold tracking-tight">{example.before.title}</p>
@@ -735,7 +735,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center text-gray-500 text-lg max-w-2xl mx-auto mb-16"
           >
-            A local coffee shop usually donates a $25 gift card. With WCIO, AI helps them discover offerings that raise <span className="text-navy-900 font-semibold">8&ndash;24x more</span> — at almost no extra cost. Drag the slider to compare.
+            A local coffee shop usually donates a $25 gift card. With DonorSpark, AI helps them discover offerings that raise <span className="text-navy-900 font-semibold">8&ndash;24x more</span> — at almost no extra cost. Drag the slider to compare.
           </motion.p>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -758,7 +758,7 @@ export default function Home() {
               </div>
               <div>
                 <p className="text-white font-semibold text-lg">One coffee shop. Three creative offerings.</p>
-                <p className="text-gray-400 text-sm">$75 in gift cards → $1,200 in auction value</p>
+                <p className="text-gray-400 text-sm">$75 in basic donations → $1,200 in auction value</p>
               </div>
             </div>
             <button
