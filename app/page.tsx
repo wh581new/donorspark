@@ -119,6 +119,296 @@ const BEFORE_AFTER_EXAMPLES = [
 ]
 
 /* ────────────────────────────────────────────────
+   Animated Counter Hook & Stats Section
+   ──────────────────────────────────────────────── */
+function AnimatedStat({ target, prefix = '', suffix = '', label, icon: Icon }: { target: number; prefix?: string; suffix?: string; label: string; icon: React.ElementType }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-100px' })
+  const count = useCountUp(target, 2000, inView)
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ once: true }}
+      className="text-center"
+    >
+      <Icon className="w-6 h-6 text-emerald-400 mx-auto mb-3" />
+      <p className="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-2">{prefix}{count.toLocaleString()}{suffix}</p>
+      <p className="text-gray-400 text-sm sm:text-base">{label}</p>
+    </motion.div>
+  )
+}
+
+function useCountUp(target: number, duration: number = 2000, inView: boolean = false) {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    if (!inView) return
+    let start = 0
+    const startTime = Date.now()
+    const tick = () => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      // Ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setCount(Math.round(eased * target))
+      if (progress < 1) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }, [inView, target, duration])
+  return count
+}
+
+/* ────────────────────────────────────────────────
+   Summary Bar with Animated Numbers
+   ──────────────────────────────────────────────── */
+function SummaryBar({ scrollToForm }: { scrollToForm: () => void }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-80px' })
+  const donationCount = useCountUp(75, 1600, inView)
+  const auctionCount = useCountUp(1200, 2000, inView)
+  const multiplier = useCountUp(16, 1800, inView)
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ once: true }}
+      className="mt-12 bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden"
+    >
+      {/* Subtle glow */}
+      <div className="absolute -top-12 -right-12 w-48 h-48 bg-emerald-500/10 rounded-full blur-[60px]" />
+      <div className="flex items-center gap-4 relative">
+        <motion.div
+          whileInView={{ rotate: [0, -10, 10, -5, 0] }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          viewport={{ once: true }}
+          className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center"
+        >
+          <Coffee className="w-6 h-6 text-emerald-400" />
+        </motion.div>
+        <div>
+          <p className="text-white font-semibold text-lg">One coffee shop. Three creative offerings.</p>
+          <p className="text-gray-400 text-sm">
+            <span className="text-white font-medium">${donationCount}</span> in basic donations →{' '}
+            <span className="text-emerald-400 font-bold">${auctionCount.toLocaleString()}</span> in auction value —{' '}
+            <span className="text-emerald-400 font-semibold">{multiplier}x more</span>
+          </p>
+        </div>
+      </div>
+      <button
+        onClick={scrollToForm}
+        className="group bg-white hover:bg-gray-100 text-navy-900 font-medium py-3 px-6 rounded-full transition-all text-sm flex items-center gap-2 flex-shrink-0 hover:shadow-lg hover:shadow-white/10"
+      >
+        Try it free
+        <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+      </button>
+    </motion.div>
+  )
+}
+
+/* ────────────────────────────────────────────────
+   Animated Hero Demo Component
+   ──────────────────────────────────────────────── */
+const DEMO_PROFILES = [
+  {
+    text: "I'm a dentist who loves golf and wine 🦷⛳🍷",
+    suggestions: [
+      { title: 'Teeth Whitening Package', value: 800, emoji: '✨', delay: 0.6 },
+      { title: 'Golf Foursome + Lunch', value: 1200, emoji: '⛳', delay: 1.2 },
+      { title: 'Private Wine Tasting for 8', value: 600, emoji: '🍷', delay: 1.8 },
+    ],
+  },
+  {
+    text: "We own a bakery and have a lake house 🧁🏡",
+    suggestions: [
+      { title: 'Custom Wedding Cake', value: 1500, emoji: '🎂', delay: 0.6 },
+      { title: 'Weekend at the Lake House', value: 2500, emoji: '🏡', delay: 1.2 },
+      { title: 'Baking Class for 10', value: 400, emoji: '👩‍🍳', delay: 1.8 },
+    ],
+  },
+  {
+    text: "I'm a photographer with a boat 📸⛵",
+    suggestions: [
+      { title: 'Family Portrait Session', value: 500, emoji: '📸', delay: 0.6 },
+      { title: 'Sunset Sail for 6', value: 900, emoji: '⛵', delay: 1.2 },
+      { title: 'Photo + Boat Party Package', value: 1800, emoji: '🎉', delay: 1.8 },
+    ],
+  },
+]
+
+function HeroDemo() {
+  const [profileIdx, setProfileIdx] = useState(0)
+  const [phase, setPhase] = useState<'typing' | 'thinking' | 'results' | 'pause'>('typing')
+  const [displayedText, setDisplayedText] = useState('')
+  const [visibleCards, setVisibleCards] = useState(0)
+  const [totalValue, setTotalValue] = useState(0)
+
+  const profile = DEMO_PROFILES[profileIdx]
+
+  // Typing effect
+  useEffect(() => {
+    if (phase !== 'typing') return
+    setDisplayedText('')
+    setVisibleCards(0)
+    setTotalValue(0)
+    let i = 0
+    const interval = setInterval(() => {
+      i++
+      setDisplayedText(profile.text.slice(0, i))
+      if (i >= profile.text.length) {
+        clearInterval(interval)
+        setTimeout(() => setPhase('thinking'), 400)
+      }
+    }, 35)
+    return () => clearInterval(interval)
+  }, [phase, profileIdx])
+
+  // Thinking → results
+  useEffect(() => {
+    if (phase !== 'thinking') return
+    const timer = setTimeout(() => setPhase('results'), 1200)
+    return () => clearTimeout(timer)
+  }, [phase])
+
+  // Show cards one by one
+  useEffect(() => {
+    if (phase !== 'results') return
+    setVisibleCards(0)
+    const timers = profile.suggestions.map((s, i) =>
+      setTimeout(() => {
+        setVisibleCards(i + 1)
+        setTotalValue(prev => prev + s.value)
+      }, s.delay * 1000)
+    )
+    // Pause then cycle to next
+    const cycleTimer = setTimeout(() => {
+      setPhase('pause')
+      setTimeout(() => {
+        setProfileIdx(prev => (prev + 1) % DEMO_PROFILES.length)
+        setPhase('typing')
+      }, 2000)
+    }, 4500)
+    return () => { timers.forEach(clearTimeout); clearTimeout(cycleTimer) }
+  }, [phase, profileIdx])
+
+  return (
+    <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_80px_rgba(0,0,0,0.12)] border border-gray-200/60 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800">
+      {/* Subtle grid pattern */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} />
+
+      <div className="relative p-6 sm:p-10 min-h-[360px] sm:min-h-[440px] flex flex-col">
+        {/* Mock browser bar */}
+        <div className="flex items-center gap-2 mb-6">
+          <div className="flex gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-red-400/60" />
+            <div className="w-3 h-3 rounded-full bg-yellow-400/60" />
+            <div className="w-3 h-3 rounded-full bg-green-400/60" />
+          </div>
+          <div className="flex-1 bg-white/10 rounded-lg px-4 py-1.5 ml-3">
+            <span className="text-white/40 text-xs font-mono">whatcouldioffer.com/org/your-nonprofit</span>
+          </div>
+        </div>
+
+        {/* Input area */}
+        <div className="bg-white/[0.07] backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-5 mb-5">
+          <p className="text-white/40 text-xs font-medium uppercase tracking-wider mb-2">Tell us about yourself</p>
+          <div className="flex items-center gap-2">
+            <p className="text-white text-base sm:text-lg font-medium flex-1 min-h-[28px]">
+              {displayedText}
+              {phase === 'typing' && (
+                <motion.span
+                  animate={{ opacity: [1, 0] }}
+                  transition={{ duration: 0.5, repeat: Infinity }}
+                  className="inline-block w-0.5 h-5 bg-emerald-400 ml-0.5 align-middle"
+                />
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* AI thinking indicator */}
+        <AnimatePresence>
+          {phase === 'thinking' && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex items-center gap-3 mb-4"
+            >
+              <div className="flex gap-1">
+                {[0, 1, 2].map(i => (
+                  <motion.div
+                    key={i}
+                    animate={{ scale: [1, 1.4, 1], opacity: [0.4, 1, 0.4] }}
+                    transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.2 }}
+                    className="w-2 h-2 rounded-full bg-emerald-400"
+                  />
+                ))}
+              </div>
+              <span className="text-emerald-400/80 text-sm">Discovering auction ideas...</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Suggestion cards */}
+        <div className="flex-1 flex flex-col gap-3">
+          <AnimatePresence mode="popLayout">
+            {(phase === 'results' || phase === 'pause') && profile.suggestions.slice(0, visibleCards).map((s, i) => (
+              <motion.div
+                key={`${profileIdx}-${i}`}
+                initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="flex items-center gap-4 bg-white/[0.07] backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-4"
+              >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-xl flex-shrink-0">
+                  {s.emoji}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-semibold text-sm sm:text-[15px] truncate">{s.title}</p>
+                  <p className="text-white/40 text-xs">Estimated auction value</p>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-emerald-400 font-bold text-lg sm:text-xl">${s.value.toLocaleString()}</p>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+
+        {/* Total value bar */}
+        <AnimatePresence>
+          {totalValue > 0 && (phase === 'results' || phase === 'pause') && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between"
+            >
+              <span className="text-white/50 text-sm font-medium">Total auction value discovered</span>
+              <motion.span
+                key={totalValue}
+                initial={{ scale: 1.2 }}
+                animate={{ scale: 1 }}
+                className="text-emerald-400 font-bold text-2xl"
+              >
+                ${totalValue.toLocaleString()}
+              </motion.span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
+
+/* ────────────────────────────────────────────────
    Before/After Card Component
    ──────────────────────────────────────────────── */
 function BeforeAfterCard({ example, index }: { example: typeof BEFORE_AFTER_EXAMPLES[0]; index: number }) {
@@ -540,7 +830,23 @@ export default function Home() {
 
       {/* ── Hero ── */}
       <section className="relative pt-32 pb-24 px-6 overflow-hidden">
-        <div className="max-w-6xl mx-auto">
+        {/* Animated gradient background orbs */}
+        <motion.div
+          animate={{ x: [0, 80, 0], y: [0, -40, 0], scale: [1, 1.2, 1] }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-20 right-1/4 w-[500px] h-[500px] bg-emerald-100/40 rounded-full blur-[120px] pointer-events-none"
+        />
+        <motion.div
+          animate={{ x: [0, -60, 0], y: [0, 50, 0], scale: [1, 1.15, 1] }}
+          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute bottom-0 left-1/6 w-[400px] h-[400px] bg-teal-100/30 rounded-full blur-[100px] pointer-events-none"
+        />
+        <motion.div
+          animate={{ x: [0, 40, 0], y: [0, -20, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-1/3 left-1/2 w-[300px] h-[300px] bg-sky-100/20 rounded-full blur-[80px] pointer-events-none"
+        />
+        <div className="max-w-6xl mx-auto relative">
           <div className="max-w-3xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -602,43 +908,14 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Hero image */}
+        {/* Animated product demo */}
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1, delay: 0.3, ease }}
           className="max-w-6xl mx-auto mt-20"
         >
-          <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_80px_rgba(0,0,0,0.12)] border border-gray-200/60">
-            <img
-              src={HERO_IMAGE}
-              alt="Charity gala event"
-              className="w-full h-[320px] sm:h-[440px] object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-12">
-              <div className="flex items-end justify-between">
-                <div>
-                  <p className="text-white/70 text-sm font-medium mb-1">Trusted by nonprofits everywhere</p>
-                  <p className="text-white text-2xl sm:text-3xl font-semibold tracking-tight">
-                    Raise more. With less effort.
-                  </p>
-                </div>
-                <div className="hidden sm:flex gap-6">
-                  {[
-                    { val: '60 sec', sub: 'setup' },
-                    { val: '30%', sub: 'more items' },
-                    { val: 'Free', sub: 'forever' },
-                  ].map((s, i) => (
-                    <div key={i} className="text-right">
-                      <p className="text-white text-xl font-semibold">{s.val}</p>
-                      <p className="text-white/60 text-xs">{s.sub}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          <HeroDemo />
         </motion.div>
       </section>
 
@@ -714,6 +991,30 @@ export default function Home() {
       </section>
 
       {/* ══════════════════════════════════════════════
+          SECTION: ANIMATED STATS BAR
+          ══════════════════════════════════════════════ */}
+      <section className="py-20 px-6 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
+        {/* Subtle animated gradient orbs */}
+        <motion.div
+          animate={{ x: [0, 60, 0], y: [0, -30, 0], scale: [1, 1.1, 1] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[100px]"
+        />
+        <motion.div
+          animate={{ x: [0, -40, 0], y: [0, 20, 0], scale: [1, 1.15, 1] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[300px] h-[300px] bg-teal-500/10 rounded-full blur-[80px]"
+        />
+        <div className="max-w-6xl mx-auto relative">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 sm:gap-12">
+            <AnimatedStat target={2400} suffix="+" label="Auction items discovered" icon={Gift} />
+            <AnimatedStat target={380} prefix="$" suffix="K+" label="In potential auction value" icon={TrendingUp} />
+            <AnimatedStat target={150} suffix="+" label="Nonprofits using WCIO" icon={Users} />
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
           SECTION 3: BEFORE/AFTER EXAMPLES (NEW)
           ══════════════════════════════════════════════ */}
       <section className="py-28 px-6 bg-white">
@@ -747,31 +1048,8 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Summary bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3, ease }}
-            viewport={{ once: true }}
-            className="mt-12 bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
-                <Coffee className="w-6 h-6 text-emerald-400" />
-              </div>
-              <div>
-                <p className="text-white font-semibold text-lg">One coffee shop. Three creative offerings.</p>
-                <p className="text-gray-400 text-sm">$75 in basic donations → $1,200 in auction value — <span className="text-emerald-400 font-semibold">16x more</span></p>
-              </div>
-            </div>
-            <button
-              onClick={scrollToForm}
-              className="group bg-white hover:bg-gray-100 text-navy-900 font-medium py-3 px-6 rounded-full transition-all text-sm flex items-center gap-2 flex-shrink-0"
-            >
-              Try it free
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </button>
-          </motion.div>
+          {/* Summary bar — animated */}
+          <SummaryBar scrollToForm={scrollToForm} />
         </div>
       </section>
 
@@ -821,21 +1099,26 @@ export default function Home() {
                 key={idx}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: idx * 0.1, ease }}
+                transition={{ duration: 0.6, delay: idx * 0.15, ease }}
                 viewport={{ once: true }}
-                className="group"
+                whileHover={{ y: -6 }}
+                className="group cursor-default"
               >
-                <div className="relative rounded-2xl overflow-hidden mb-6 bg-gray-100">
+                <div className="relative rounded-2xl overflow-hidden mb-6 bg-gray-100 shadow-sm group-hover:shadow-xl transition-shadow duration-500">
                   <img
                     src={item.img}
                     alt={item.title}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-700"
                   />
-                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-navy-900">{item.num}</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center group-hover:bg-emerald-500 transition-colors duration-300">
+                    <span className="text-sm font-semibold text-navy-900 group-hover:text-white transition-colors duration-300">{item.num}</span>
+                  </div>
+                  <div className="absolute bottom-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                    <item.icon className="w-5 h-5 text-emerald-600" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-navy-900 mb-2 tracking-tight">{item.title}</h3>
+                <h3 className="text-xl font-semibold text-navy-900 mb-2 tracking-tight group-hover:text-emerald-700 transition-colors duration-300">{item.title}</h3>
                 <p className="text-gray-500 leading-relaxed text-[15px]">{item.desc}</p>
               </motion.div>
             ))}
@@ -844,14 +1127,34 @@ export default function Home() {
       </section>
 
       {/* ── Registration Form ── */}
-      <section ref={formRef} className="py-28 px-6 bg-white">
-        <div className="max-w-xl mx-auto">
+      <section ref={formRef} className="py-28 px-6 bg-white relative overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[1px] bg-gradient-to-r from-transparent via-emerald-200 to-transparent" />
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-1/4 -right-32 w-64 h-64 bg-emerald-50 rounded-full blur-[80px] pointer-events-none"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.4, 0.2] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute bottom-1/4 -left-32 w-64 h-64 bg-teal-50 rounded-full blur-[80px] pointer-events-none"
+        />
+        <div className="max-w-xl mx-auto relative">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={formInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, ease }}
+            initial={{ opacity: 0, y: 30, scale: 0.97 }}
+            animate={formInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+            transition={{ duration: 0.8, ease }}
             className="text-center mb-12"
           >
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={formInView ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.5, delay: 0.2, ease }}
+              className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-5"
+            >
+              <Sparkles className="w-7 h-7 text-emerald-600" />
+            </motion.div>
             <h2 className="text-3xl sm:text-4xl font-bold text-navy-900 tracking-tight mb-3">
               Get started for free
             </h2>
