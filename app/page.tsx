@@ -560,13 +560,14 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.05, ease }}
               className="text-5xl sm:text-6xl lg:text-[72px] font-bold text-navy-900 leading-[1.05] tracking-tight mb-6"
             >
-              Unlock the hidden
-              <br />
-              generosity of your
-              <br />
+              Unlock the{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">
-                donors.
-              </span>
+                hidden
+                <br />
+                generosity
+              </span>{' '}of your
+              <br />
+              donors.
             </motion.h1>
 
             <motion.p
@@ -575,7 +576,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.1, ease }}
               className="text-lg sm:text-xl text-gray-500 leading-relaxed mb-10 max-w-lg"
             >
-              Help supporters discover creative auction items they never knew they could give. Set up in 60 seconds.
+              AI-powered auction item discovery that helps your supporters give more than they ever thought possible. <span className="text-navy-900 font-semibold">Raise 10x+ more in your next auction.</span>
             </motion.p>
 
             <motion.div
