@@ -195,7 +195,7 @@ function SuggestionCard({
       />
 
       <div className="p-6 sm:p-7">
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-3 sm:gap-4">
           <motion.div className="flex-shrink-0 mt-1" whileTap={{ scale: 0.85 }}>
             <motion.div animate={selected ? { scale: [1, 1.2, 1] } : {}} transition={{ duration: 0.3 }}>
               {selected ? (
@@ -548,7 +548,7 @@ function ShareModal({
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.3 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/20"
+          className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full p-5 sm:p-8 border border-white/20"
         >
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-2xl font-bold text-navy-900">Share your offerings</h3>
@@ -736,7 +736,7 @@ function ChipSelector({
   brandColor: string;
 }) {
   return (
-    <div className="flex flex-wrap gap-3 justify-center">
+    <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
       {options.map((opt) => {
         const isSelected = selected.includes(opt.label);
         return (
@@ -745,7 +745,7 @@ function ChipSelector({
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
             onClick={() => onToggle(opt.label)}
-            className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl border-2 text-sm font-medium transition-all duration-200 ${
+            className={`inline-flex items-center gap-1.5 sm:gap-2 px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl sm:rounded-2xl border-2 text-xs sm:text-sm font-medium transition-all duration-200 ${
               isSelected
                 ? 'text-white shadow-md'
                 : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:shadow-sm'
@@ -1163,7 +1163,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
               animate="center"
               exit="exit"
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="flex-1 flex flex-col items-center justify-center px-4 py-12 min-h-[60vh]"
+              className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 min-h-[50vh] sm:min-h-[60vh]"
             >
               {/* ─── Screen 0: Welcome ─── */}
               {screen === 0 && (
@@ -1184,7 +1184,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       variants={fadeUp}
                       initial="initial"
                       animate="animate"
-                      className="text-4xl sm:text-6xl font-bold text-navy-900 mb-6 tracking-tight leading-tight"
+                      className="text-3xl sm:text-5xl lg:text-6xl font-bold text-navy-900 mb-6 tracking-tight leading-tight"
                     >
                       Uncover your<br />
                       <span className="text-emerald-600">auction potential</span>
@@ -1195,7 +1195,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       initial="initial"
                       animate="animate"
                       transition={{ delay: 0.15 }}
-                      className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-12"
+                      className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-12"
                     >
                       {org.message ? (
                         <>{org.message} Just answer a few quick questions and we&apos;ll show you ideas!</>
@@ -1223,7 +1223,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.6 }}
-                      className="mt-16"
+                      className="mt-10 sm:mt-16"
                     >
                       <div className="flex items-center justify-center gap-1 mb-3">
                         {[1, 2, 3, 4, 5].map(i => (
@@ -1299,7 +1299,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                         onChange={e => setUnified(prev => ({ ...prev, occupation: e.target.value }))}
                         onKeyDown={handleKeyDown}
                         placeholder="e.g., Software engineer, Yoga instructor, Dentist..."
-                        className="w-full text-center text-xl px-6 py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
+                        className="w-full text-center text-lg sm:text-xl px-4 sm:px-6 py-3.5 sm:py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
                       />
                     ) : (
                       <>
@@ -1310,7 +1310,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                           onChange={e => setUnified(prev => ({ ...prev, businessName: e.target.value }))}
                           onKeyDown={handleKeyDown}
                           placeholder="Business name"
-                          className="w-full text-center text-xl px-6 py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
+                          className="w-full text-center text-lg sm:text-xl px-4 sm:px-6 py-3.5 sm:py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
                         />
                         <input
                           type="text"
@@ -1318,7 +1318,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                           onChange={e => setUnified(prev => ({ ...prev, industry: e.target.value }))}
                           onKeyDown={handleKeyDown}
                           placeholder="Industry (e.g., Restaurant, Real estate, Consulting...)"
-                          className="w-full text-center text-lg px-6 py-3.5 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
+                          className="w-full text-center text-base sm:text-lg px-4 sm:px-6 py-3 sm:py-3.5 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none"
                         />
                       </>
                     )}
@@ -1365,7 +1365,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                     onChange={e => setUnified(prev => ({ ...prev, hiddenTalents: e.target.value }))}
                     placeholder="e.g., I make incredible sourdough, I used to be a pilot, I can teach anyone to play guitar, I know every restaurant owner in town..."
                     rows={4}
-                    className="w-full text-center text-lg px-6 py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none resize-none"
+                    className="w-full text-center text-base sm:text-lg px-4 sm:px-6 py-3.5 sm:py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none resize-none"
                   />
                   <p className="text-xs text-gray-400 mt-3">Press Enter or click Next to continue. Leave blank to skip.</p>
                 </TypeformScreen>
@@ -1410,7 +1410,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                     onChange={e => setUnified(prev => ({ ...prev, socialText: e.target.value }))}
                     placeholder="Paste your LinkedIn, Instagram, or Facebook bio — or just tell us a bit about yourself..."
                     rows={4}
-                    className="w-full text-lg px-6 py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none resize-none"
+                    className="w-full text-base sm:text-lg px-4 sm:px-6 py-3.5 sm:py-4 rounded-2xl border-2 border-gray-200 text-navy-900 placeholder-gray-400 transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 outline-none resize-none"
                   />
 
                   {error && (
@@ -1498,7 +1498,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
 
               <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
-                  <h2 className="text-3xl font-bold text-navy-900 mb-2">Your personalized offerings</h2>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-navy-900 mb-2">Your personalized offerings</h2>
                   <p className="text-gray-600">
                     We found {allSuggestions.length} offering{allSuggestions.length !== 1 ? 's' : ''} tailored to you
                     {hiddenGemsCount > 0 && ` (including ${hiddenGemsCount} hidden gem${hiddenGemsCount !== 1 ? 's' : ''})`}

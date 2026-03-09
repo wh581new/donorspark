@@ -177,7 +177,7 @@ function SummaryBar({ scrollToForm }: { scrollToForm: () => void }) {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
       viewport={{ once: true }}
-      className="mt-12 bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden"
+      className="mt-12 bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-5 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden"
     >
       {/* Subtle glow */}
       <div className="absolute -top-12 -right-12 w-48 h-48 bg-emerald-500/10 rounded-full blur-[60px]" />
@@ -191,7 +191,7 @@ function SummaryBar({ scrollToForm }: { scrollToForm: () => void }) {
           <Coffee className="w-6 h-6 text-emerald-400" />
         </motion.div>
         <div>
-          <p className="text-white font-semibold text-lg">One coffee shop. Three creative offerings.</p>
+          <p className="text-white font-semibold text-base sm:text-lg">One coffee shop. Three creative offerings.</p>
           <p className="text-gray-400 text-sm">
             <span className="text-white font-medium">${donationCount}</span> in basic donations →{' '}
             <span className="text-emerald-400 font-bold">${auctionCount.toLocaleString()}</span> in auction value —{' '}
@@ -686,7 +686,7 @@ export default function Home() {
           {/* Card */}
           <div className="bg-white rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.08)] overflow-hidden">
             {/* Header */}
-            <div className="px-10 pt-14 pb-10 text-center">
+            <div className="px-6 sm:px-10 pt-10 sm:pt-14 pb-8 sm:pb-10 text-center">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -704,7 +704,7 @@ export default function Home() {
             </div>
 
             {/* Links */}
-            <div className="px-10 pb-10 space-y-5">
+            <div className="px-6 sm:px-10 pb-8 sm:pb-10 space-y-5">
               {/* Donor link */}
               <div>
                 <label className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 block">
@@ -867,7 +867,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.05, ease }}
-              className="text-5xl sm:text-6xl lg:text-[72px] font-bold text-navy-900 leading-[1.05] tracking-tight mb-6"
+              className="text-3xl sm:text-5xl lg:text-[72px] font-bold text-navy-900 leading-[1.05] tracking-tight mb-6"
             >
               Unlock the{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">
@@ -1030,7 +1030,7 @@ export default function Home() {
             className="text-center mb-6"
           >
             <p className="text-sm font-medium text-emerald-600 mb-3 tracking-wide uppercase">See the difference</p>
-            <h2 className="text-4xl sm:text-5xl font-bold text-navy-900 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-navy-900 tracking-tight">
               Same coffee shop. Way more impact.
             </h2>
           </motion.div>
@@ -1069,7 +1069,7 @@ export default function Home() {
             className="text-center mb-20"
           >
             <p className="text-sm font-medium text-emerald-600 mb-3 tracking-wide uppercase">How it works</p>
-            <h2 className="text-4xl sm:text-5xl font-bold text-navy-900 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-navy-900 tracking-tight">
               Three steps to better auctions
             </h2>
           </motion.div>
