@@ -974,8 +974,12 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
       });
 
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || 'Something went wrong');
+        let errMsg = 'Something went wrong. Please try again.';
+        try {
+          const errData = await res.json();
+          errMsg = errData.error || errMsg;
+        } catch { /* response wasn't JSON */ }
+        throw new Error(errMsg);
       }
 
       const data: SuggestionsResponse = await res.json();

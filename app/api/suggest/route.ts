@@ -67,7 +67,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const message = error instanceof Error ? error.message : 'An unexpected error occurred';
-    return NextResponse.json({ error: message }, { status: 500 });
+    // Provide user-friendly error messages instead of raw API errors
+    let userMessage = 'An unexpected error occurred. Please try again.';
+    const rawMessage = error instanceof Error ? error.message : '';
+
+    if (rawMessage.includes('credit') || rawMessage.includes('billing') || rawMessage.includes('balance')) {
+      userMessage = 'Our AI service is temporarily unavailable. Please try again shortly.';
+    } else if (rawMessage.includes('rate') || rawMessage.includes('throttl') || rawMessage.includes('overloaded')) {
+      userMessage = 'We\'re experiencing high demand. Please wait a moment and try again.';
+    } else if (rawMessage.includes('timeout') || rawMessage.includes('ETIMEDOUT')) {
+      userMessage = 'The request took too long. Please try again.';
+    }
+
+    return NextResponse.json({ error: userMessage }, { status: 500 });
   }
 }
