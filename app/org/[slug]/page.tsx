@@ -231,7 +231,7 @@ function SuggestionCard({
                 <DollarSign className="w-4 h-4 flex-shrink-0" />
                 <div>
                   <span className="text-xs font-bold">{item.estimatedValue}</span>
-                  <span className="text-[10px] opacity-70 ml-1">bid value</span>
+                  <span className="text-[10px] opacity-70 ml-1">est. value</span>
                 </div>
               </div>
               <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-2 rounded-xl">
@@ -512,8 +512,12 @@ function ShareModal({
       });
 
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || 'Failed to share');
+        let errMsg = 'Failed to share. Please try again.';
+        try {
+          const errData = await res.json();
+          errMsg = errData.error || errMsg;
+        } catch { /* response wasn't JSON */ }
+        throw new Error(errMsg);
       }
 
       setSuccess(true);
@@ -618,11 +622,11 @@ function ThankYouPage({ orgName, orgSlug, brandColor, didShare = true }: { orgNa
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const shareText = `I just discovered creative auction items I can donate to ${orgName} using DonorSpark! Try it yourself:`;
+  const shareText = `I just discovered creative auction items I can donate to ${orgName}! Try it yourself:`;
 
   return (
     <>
-      {showConfetti && <ConfettiBurst />}
+      {showConfetti && didShare && <ConfettiBurst />}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -635,7 +639,7 @@ function ThankYouPage({ orgName, orgSlug, brandColor, didShare = true }: { orgNa
           transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] as const }}
           className="text-7xl mb-6"
         >
-          🎉
+          {didShare ? '🎉' : '👋'}
         </motion.div>
 
         <motion.h2
@@ -644,7 +648,7 @@ function ThankYouPage({ orgName, orgSlug, brandColor, didShare = true }: { orgNa
           transition={{ delay: 0.3 }}
           className="text-4xl font-bold text-navy-900 mb-3 tracking-tight"
         >
-          You&apos;re amazing!
+          {didShare ? 'You\u0027re amazing!' : 'Thanks for stopping by!'}
         </motion.h2>
 
         <motion.p
@@ -1398,7 +1402,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                 <TypeformScreen
                   screenNum="Step 6 of 6 — Optional"
                   title="Anything else we should know?"
-                  subtitle="Paste your LinkedIn, Instagram, or Facebook bio — or just tell us about yourself. Or hit Discover!"
+                  subtitle="Paste your LinkedIn, Instagram, or Facebook bio — or just tell us about yourself"
                 >
                   <textarea
                     ref={inputRef as React.RefObject<HTMLTextAreaElement>}
@@ -1492,7 +1496,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                 </motion.span>
               </motion.div>
 
-              <div className="mb-10 flex items-end justify-between">
+              <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
                   <h2 className="text-3xl font-bold text-navy-900 mb-2">Your personalized offerings</h2>
                   <p className="text-gray-600">
@@ -1508,7 +1512,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       setSelectedIds(new Set(allSuggestions.map((_, i) => i)));
                     }
                   }}
-                  className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-emerald-50"
+                  className="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-emerald-50 self-start sm:self-auto flex-shrink-0"
                 >
                   {selectedIds.size === allSuggestions.length ? (
                     <><X className="w-3.5 h-3.5" /> Deselect all</>
@@ -1544,7 +1548,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
 
               {!loadingMore && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 mb-10">
-                  <div className="flex gap-4 justify-center">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                     <motion.button
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
@@ -1552,7 +1556,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       disabled={loadingMore}
                       className="px-6 py-3 rounded-xl border-2 border-gray-300 text-navy-900 font-semibold transition-all hover:border-emerald-400 hover:text-emerald-700"
                     >
-                      <span className="flex items-center gap-2">
+                      <span className="flex items-center justify-center gap-2">
                         <Lightbulb className="w-4 h-4" /> Get more ideas
                       </span>
                     </motion.button>
@@ -1561,11 +1565,11 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       whileTap={{ scale: 0.99 }}
                       onClick={() => setShowShareModal(true)}
                       disabled={selectedItems.length === 0}
-                      className="px-6 py-3 rounded-xl text-white font-semibold transition-all flex items-center gap-2 shadow-lg disabled:opacity-50"
+                      className="px-6 py-3 rounded-xl text-white font-semibold transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
                       style={{ backgroundColor: brandColor }}
                     >
                       <Send className="w-4 h-4" />
-                      Share {selectedItems.length > 0 && `(${selectedItems.length})`}
+                      {selectedItems.length > 0 ? `Share ${selectedItems.length} offering${selectedItems.length !== 1 ? 's' : ''}` : 'Select items to share'}
                     </motion.button>
                   </div>
                   {selectedItems.length === 0 && (
