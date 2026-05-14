@@ -1139,25 +1139,19 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
 
       {/* ─── Main Content ─── */}
       <main className="flex-1 flex flex-col">
-        <AnimatePresence mode="wait">
-          {/* ═══ LOADING STATE ═══ */}
-          {loading && (
-            <motion.div key="loading" {...pageTransition} className="flex-1">
-              <LoadingState isMore={false} />
-            </motion.div>
-          )}
+        {/* ═══ LOADING STATE ═══ */}
+        {loading && (
+          <div className="flex-1">
+            <LoadingState isMore={false} />
+          </div>
+        )}
 
-          {/* ═══ UNIFIED FLOW ═══ */}
-          {!loading && phase === 'flow' && (
-            <motion.div
-              key={`screen-${screen}`}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 min-h-[50vh] sm:min-h-[60vh]"
-            >
+        {/* ═══ UNIFIED FLOW ═══ */}
+        {!loading && phase === 'flow' && (
+          <div
+            key={`screen-${screen}`}
+            className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 min-h-[50vh] sm:min-h-[60vh]"
+          >
               {/* ─── Screen 0: Welcome ─── */}
               {screen === 0 && (
                 <div className="relative w-full max-w-3xl mx-auto">
@@ -1467,12 +1461,12 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                   Back
                 </motion.button>
               )}
-            </motion.div>
-          )}
+            </div>
+        )}
 
-          {/* ═══ RESULTS ═══ */}
-          {!loading && phase === 'results' && (
-            <motion.div key="results" {...pageTransition} className="max-w-5xl mx-auto px-4 py-8 pb-32 w-full" ref={resultsRef}>
+        {/* ═══ RESULTS ═══ */}
+        {!loading && phase === 'results' && (
+          <div className="max-w-5xl mx-auto px-4 py-8 pb-32 w-full" ref={resultsRef}>
               <motion.div
                 initial={{ opacity: 1 }}
                 animate={{ opacity: 0 }}
@@ -1598,14 +1592,13 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                   />
                 )}
               </AnimatePresence>
-            </motion.div>
-          )}
+          </div>
+        )}
 
-          {/* ═══ THANK YOU ═══ */}
-          {phase === 'thankyou' && (
-            <ThankYouPage orgName={org.name} orgSlug={org.slug} brandColor={brandColor} didShare={didShare} />
-          )}
-        </AnimatePresence>
+        {/* ═══ THANK YOU ═══ */}
+        {phase === 'thankyou' && (
+          <ThankYouPage orgName={org.name} orgSlug={org.slug} brandColor={brandColor} didShare={didShare} />
+        )}
       </main>
 
       {/* Footer */}
