@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'What Could I Offer? — AI-Powered Auction Item Discovery by BetterWorld',
+  title: 'What Could I Offer? — AI-Powered Auction Item Discovery',
   description:
     'Help supporters discover creative, high-value auction items they never knew they could give. Set up your nonprofit fundraising page in 60 seconds — free forever.',
   keywords: [
@@ -14,10 +14,9 @@ export const metadata: Metadata = {
     'donor engagement',
     'silent auction',
     'gala auction',
-    'BetterWorld',
   ],
-  authors: [{ name: 'BetterWorld', url: 'https://betterworld.org' }],
-  creator: 'BetterWorld',
+  authors: [{ name: 'What Could I Offer?' }],
+  creator: 'What Could I Offer?',
   metadataBase: new URL('https://whatcouldioffer.com'),
   openGraph: {
     type: 'website',

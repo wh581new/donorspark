@@ -647,14 +647,7 @@ export default function AdminDashboard() {
                 View donor page
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </a>
-              <a
-                href="https://betterworld.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:block"
-              >
-                <BetterWorldLogo className="h-5 opacity-40 hover:opacity-70 transition-opacity" />
-              </a>
+              {/* branding placeholder */}
             </div>
           </div>
         </div>
@@ -724,10 +717,6 @@ export default function AdminDashboard() {
               Powered by{' '}
               <a href="/" target="_blank" rel="noopener noreferrer" className="font-medium text-gray-500 hover:text-gray-700 transition-colors">
                 What Could I Offer?
-              </a>
-              {' · '}
-              <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer" className="font-medium text-gray-500 hover:text-gray-700 transition-colors">
-                betterworld
               </a>
             </p>
           </div>

@@ -711,10 +711,7 @@ function ThankYouPage({ orgName, orgSlug, brandColor, didShare = true }: { orgNa
           transition={{ delay: 0.9 }}
           className="flex items-center justify-center gap-1.5 text-xs text-gray-400"
         >
-          Powered by{' '}
-          <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer">
-            <img src="https://betterworld.org/assets/brand/wordmark-denim.svg" alt="BetterWorld" className="h-3 w-auto" draggable={false} />
-          </a>
+          Powered by What Could I Offer?
         </motion.div>
       </motion.div>
     </>
@@ -1054,8 +1051,8 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
           <h2 className="text-xl font-bold text-navy-900 mb-2">Organization not found</h2>
 
           <p className="text-gray-600 mb-6">This link doesn&apos;t seem to be active.</p>
-          <a href="https://betterworld.org" className="text-emerald-600 hover:text-emerald-700 font-medium">
-            Go to betterworld &rarr;
+          <a href="/" className="text-emerald-600 hover:text-emerald-700 font-medium">
+            Go to homepage &rarr;
           </a>
         </div>
       </div>
@@ -1096,10 +1093,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
               </div>
               <div>
                 <h1 className="text-sm font-semibold text-navy-900">{org.name}</h1>
-                <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors">
-                  powered by
-                  <img src="https://betterworld.org/assets/brand/wordmark-denim.svg" alt="BetterWorld" className="h-2.5 w-auto" draggable={false} />
-                </a>
+                <p className="text-xs text-gray-500">powered by What Could I Offer?</p>
               </div>
             </div>
             {(screen > 0 || phase === 'results') && (
@@ -1623,16 +1617,12 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
           transition={{ delay: 0.8 }}
           className="text-center pb-8 pt-4 space-y-2"
         >
-          <div className="flex items-center justify-center gap-1.5 text-xs text-gray-500">
-            Built by{' '}
-            <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer" className="inline-flex">
-              <img src="https://betterworld.org/assets/brand/wordmark-denim.svg" alt="BetterWorld" className="h-3 w-auto" draggable={false} />
+          <p className="text-xs text-gray-500">
+            Powered by{' '}
+            <a href="/" className="text-emerald-600 hover:text-emerald-700 font-semibold">
+              What Could I Offer?
             </a>
-          </div>
-          <div className="flex items-center justify-center gap-4 text-[10px] text-gray-400">
-            <a href="https://help.betterworld.org/en/articles/8557905-privacy-policy" className="hover:text-gray-600 transition-colors">Privacy</a>
-            <a href="https://help.betterworld.org/en/articles/8557943-terms-conditions" className="hover:text-gray-600 transition-colors">Terms</a>
-          </div>
+          </p>
         </motion.div>
       )}
     </div>

@@ -42,7 +42,7 @@ OFFERINGS (${body.selectedOfferings.length} item${body.selectedOfferings.length 
 ${offeringsList}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Powered by What Could I Offer? — by BetterWorld
+Powered by What Could I Offer?
 `.trim();
 
     // For hackathon: log the email and return success

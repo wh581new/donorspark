@@ -777,10 +777,9 @@ export default function Home() {
 
           {/* Powered by */}
           <div className="text-center mt-8">
-            <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-gray-400 hover:text-gray-500 transition-colors text-sm">
-              Powered by
-              <BetterWorldLogo className="h-4 w-auto" color="#9ca3af" />
-            </a>
+            <span className="inline-flex items-center gap-2 text-gray-400 text-sm">
+              What Could I Offer?
+            </span>
           </div>
         </motion.div>
       </div>
@@ -814,10 +813,7 @@ export default function Home() {
               <span className="font-semibold text-navy-900 text-[15px] tracking-tight leading-tight">
                 What Could I Offer?
               </span>
-              <a href="https://betterworld.org" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[9px] text-navy-900/60 hover:text-navy-900 transition-colors leading-tight">
-                by
-                <BetterWorldLogo className="h-2 w-auto" color="#1a2640" />
-              </a>
+              <span className="text-[9px] text-navy-900/60 leading-tight">AI-Powered Auction Discovery</span>
             </div>
           </div>
           <div className="flex items-center">
@@ -1354,28 +1350,10 @@ export default function Home() {
       <footer className="border-t border-gray-100 py-12 px-6 bg-[#fafbfc]">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-400">Powered by</span>
-            <a
-              href="https://betterworld.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group"
-            >
-              <div className="transition-all duration-500 group-hover:hue-rotate-[45deg]">
-                <BetterWorldLogo className="h-5 w-auto transition-all duration-500 group-hover:scale-110" color="#6b7280" />
-              </div>
-            </a>
+            <span className="text-sm text-gray-400">What Could I Offer?</span>
           </div>
           <div className="flex gap-8 text-sm text-gray-400">
-            <a href="https://help.betterworld.org/en/articles/8557905-privacy-policy" className="hover:text-gray-600 transition-colors">
-              Privacy
-            </a>
-            <a href="https://help.betterworld.org/en/articles/8557943-terms-conditions" className="hover:text-gray-600 transition-colors">
-              Terms
-            </a>
-            <a href="mailto:support@betterworld.org" className="hover:text-gray-600 transition-colors">
-              Contact
-            </a>
+            <span>© {new Date().getFullYear()}</span>
           </div>
         </div>
       </footer>
