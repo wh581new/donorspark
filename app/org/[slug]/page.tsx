@@ -81,9 +81,9 @@ const cardReveal = {
 };
 
 const slideVariants = {
-  enter: (dir: number) => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir > 0 ? -80 : 80, opacity: 0 }),
+  enter: { opacity: 0, y: 20 },
+  center: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 },
 };
 
 /* ═══════════════════════════════════════════════
@@ -1151,12 +1151,11 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
           {!loading && phase === 'flow' && (
             <motion.div
               key={`screen-${screen}`}
-              custom={direction}
               variants={slideVariants}
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
               className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 min-h-[50vh] sm:min-h-[60vh]"
             >
               {/* ─── Screen 0: Welcome ─── */}
