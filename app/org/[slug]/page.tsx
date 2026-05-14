@@ -535,20 +535,13 @@ function ShareModal({
   return (
     <>
       {success && <ConfettiBurst />}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+      <div
         onClick={onClose}
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 flex items-center justify-center p-4 animate-fadeIn"
       >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          transition={{ duration: 0.3 }}
+        <div
           onClick={(e) => e.stopPropagation()}
-          className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full p-5 sm:p-8 border border-white/20"
+          className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-md w-full p-5 sm:p-8 border border-white/20 animate-slideUp"
         >
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-2xl font-bold text-navy-900">Share your offerings</h3>
@@ -584,16 +577,16 @@ function ShareModal({
               </ul>
             </div>
 
-            {error && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm text-red-600">{error}</motion.p>}
+            {error && <p className="text-sm text-red-600">{error}</p>}
 
-            <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} onClick={handleShare} disabled={sending}
-              className="mt-6 w-full py-3 rounded-xl text-white font-semibold disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+            <button onClick={handleShare} disabled={sending}
+              className="mt-6 w-full py-3 rounded-xl text-white font-semibold disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]"
               style={{ backgroundColor: brandColor || '#059669' }}>
               {sending ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</> : <><Send className="w-4 h-4" /> Share My Offerings</>}
-            </motion.button>
+            </button>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </>
   );
 }
@@ -627,93 +620,54 @@ function ThankYouPage({ orgName, orgSlug, brandColor, didShare = true }: { orgNa
   return (
     <>
       {showConfetti && didShare && <ConfettiBurst />}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as const }}
-        className="max-w-lg mx-auto text-center py-16 px-4"
-      >
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: [0, 1.4, 1] }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] as const }}
-          className="text-7xl mb-6"
-        >
+      <div className="max-w-lg mx-auto text-center py-16 px-4 animate-fadeIn">
+        <div className="text-7xl mb-6 animate-bounceIn">
           {didShare ? '🎉' : '👋'}
-        </motion.div>
+        </div>
 
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="text-4xl font-bold text-navy-900 mb-3 tracking-tight"
-        >
+        <h2 className="text-4xl font-bold text-navy-900 mb-3 tracking-tight">
           {didShare ? 'You\u0027re amazing!' : 'Thanks for stopping by!'}
-        </motion.h2>
+        </h2>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="text-gray-600 text-lg mb-10 leading-relaxed"
-        >
+        <p className="text-gray-600 text-lg mb-10 leading-relaxed">
           {didShare ? (
                     <>Your offerings have been shared with <span className="font-semibold text-navy-900">{orgName}</span>. You&apos;re making a real difference.</>
                   ) : (
                     <>Thanks for checking out <span className="font-semibold text-navy-900">{orgName}</span>&apos;s auction. Come back anytime to share your offerings!</>
                   )}
-        </motion.p>
+        </p>
 
         {/* Share with a friend section */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="bg-gradient-to-b from-white to-cream-50 rounded-3xl p-8 border border-gray-200/60 shadow-sm mb-8"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 15 }}
-            className="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center mx-auto mb-4"
-          >
+        <div className="bg-gradient-to-b from-white to-cream-50 rounded-3xl p-8 border border-gray-200/60 shadow-sm mb-8 animate-slideUp">
+          <div className="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center mx-auto mb-4">
             <Heart className="w-7 h-7 text-rose-500" />
-          </motion.div>
+          </div>
           <h3 className="text-xl font-bold text-navy-900 mb-2">Double your impact</h3>
           <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
             Know someone who might have something amazing to offer? Invite them to discover what they could contribute!
           </p>
 
           <div className="flex flex-col gap-3">
-            <motion.a
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <a
               href={`mailto:?subject=You should try this!&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`}
-              className="flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-2xl text-white font-semibold text-sm transition-all shadow-lg hover:shadow-xl"
+              className="flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-2xl text-white font-semibold text-sm transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
               style={{ backgroundColor: brandColor }}
             >
               <Mail className="w-5 h-5" /> Email a friend
-            </motion.a>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            </a>
+            <button
               onClick={copyLink}
-              className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl border-2 border-gray-200 hover:border-gray-300 text-navy-900 font-medium text-sm transition-all bg-white"
+              className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl border-2 border-gray-200 hover:border-gray-300 text-navy-900 font-medium text-sm transition-all bg-white hover:scale-[1.02] active:scale-[0.98]"
             >
               {copied ? <><Check className="w-4 h-4 text-emerald-500" /> Link copied!</> : <><Copy className="w-4 h-4" /> Copy link to share</>}
-            </motion.button>
+            </button>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
-          className="flex items-center justify-center gap-1.5 text-xs text-gray-400"
-        >
+        <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400">
           Powered by What Could I Offer?
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </>
   );
 }
@@ -737,12 +691,10 @@ function ChipSelector({
       {options.map((opt) => {
         const isSelected = selected.includes(opt.label);
         return (
-          <motion.button
+          <button
             key={opt.label}
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
             onClick={() => onToggle(opt.label)}
-            className={`inline-flex items-center gap-1.5 sm:gap-2 px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl sm:rounded-2xl border-2 text-xs sm:text-sm font-medium transition-all duration-200 ${
+            className={`inline-flex items-center gap-1.5 sm:gap-2 px-3.5 py-2.5 sm:px-5 sm:py-3 rounded-xl sm:rounded-2xl border-2 text-xs sm:text-sm font-medium transition-all duration-200 hover:scale-[1.04] active:scale-[0.96] ${
               isSelected
                 ? 'text-white shadow-md'
                 : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:shadow-sm'
@@ -752,7 +704,7 @@ function ChipSelector({
             {opt.icon}
             {opt.label}
             {isSelected && <Check className="w-4 h-4 ml-1" />}
-          </motion.button>
+          </button>
         );
       })}
     </div>
@@ -774,40 +726,21 @@ function TypeformScreen({
   title: string;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center text-center">
-      <motion.span
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-xs font-bold text-emerald-600 uppercase tracking-[0.2em] mb-4"
-      >
+    <div className="flex flex-col items-center justify-center text-center animate-fadeIn">
+      <span className="text-xs font-bold text-emerald-600 uppercase tracking-[0.2em] mb-4">
         {screenNum}
-      </motion.span>
-      <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="text-3xl sm:text-4xl font-bold text-navy-900 mb-3 leading-tight max-w-xl"
-      >
+      </span>
+      <h2 className="text-3xl sm:text-4xl font-bold text-navy-900 mb-3 leading-tight max-w-xl">
         {title}
-      </motion.h2>
+      </h2>
       {subtitle && (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="text-gray-500 mb-10 max-w-md"
-        >
+        <p className="text-gray-500 mb-10 max-w-md">
           {subtitle}
-        </motion.p>
+        </p>
       )}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        className="w-full max-w-xl"
-      >
+      <div className="w-full max-w-xl">
         {children}
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -1157,61 +1090,35 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                 <div className="relative w-full max-w-3xl mx-auto">
                   <FloatingParticles />
                   <div className="relative text-center">
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.1, duration: 0.5 }}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6 bg-emerald-50 text-emerald-700"
-                    >
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6 bg-emerald-50 text-emerald-700 animate-fadeIn">
                       <Heart className="w-4 h-4" />
                       Thanks for supporting {org.name}!
-                    </motion.div>
+                    </div>
 
-                    <motion.h2
-                      variants={fadeUp}
-                      initial="initial"
-                      animate="animate"
-                      className="text-3xl sm:text-5xl lg:text-6xl font-bold text-navy-900 mb-6 tracking-tight leading-tight"
-                    >
+                    <h2 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-navy-900 mb-6 tracking-tight leading-tight animate-fadeIn">
                       Uncover your<br />
                       <span className="text-emerald-600">auction potential</span>
-                    </motion.h2>
+                    </h2>
 
-                    <motion.p
-                      variants={fadeUp}
-                      initial="initial"
-                      animate="animate"
-                      transition={{ delay: 0.15 }}
-                      className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-12"
-                    >
+                    <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-12 animate-fadeIn">
                       {org.message ? (
                         <>{org.message} Just answer a few quick questions and we&apos;ll show you ideas!</>
                       ) : (
                         <>Help {org.name} raise more at their next auction! Just answer a few quick questions and we&apos;ll show you ideas.</>
                       )}
-                    </motion.p>
+                    </p>
 
-                    <motion.button
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
+                    <button
                       onClick={goNext}
-                      className="px-10 py-4 rounded-2xl text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-3 mx-auto"
+                      className="px-10 py-4 rounded-2xl text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-3 mx-auto animate-slideUp hover:scale-[1.03] active:scale-[0.97]"
                       style={{ backgroundColor: brandColor }}
                     >
                       Let&apos;s Go
                       <ArrowRight className="w-5 h-5" />
-                    </motion.button>
+                    </button>
 
                     {/* Social proof */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.6 }}
-                      className="mt-10 sm:mt-16"
-                    >
+                    <div className="mt-10 sm:mt-16 animate-fadeIn">
                       <div className="flex items-center justify-center gap-1 mb-3">
                         {[1, 2, 3, 4, 5].map(i => (
                           <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
@@ -1221,7 +1128,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                         &ldquo;I had no idea my backyard could be worth $2,000 at auction. This is incredible.&rdquo;
                       </p>
                       <p className="text-xs text-gray-500 mt-2">&mdash; Recent donor</p>
-                    </motion.div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1241,15 +1148,13 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                       const Icon = opt.icon;
                       const isSelected = unified.donorType === opt.type;
                       return (
-                        <motion.button
+                        <button
                           key={opt.type}
-                          whileHover={{ scale: 1.03 }}
-                          whileTap={{ scale: 0.97 }}
                           onClick={() => {
                             setUnified(prev => ({ ...prev, donorType: opt.type }));
                             setTimeout(goNext, 300);
                           }}
-                          className={`text-left p-6 rounded-2xl border-2 transition-all duration-200 ${
+                          className={`text-left p-6 rounded-2xl border-2 transition-all duration-200 hover:scale-[1.03] active:scale-[0.97] ${
                             isSelected
                               ? 'shadow-md text-white'
                               : 'bg-white border-gray-200 hover:border-gray-300 text-navy-900'
@@ -1259,7 +1164,7 @@ export default function OrgDonorPage({ params }: { params: { slug: string } }) {
                           <Icon className={`w-8 h-8 mb-3 ${isSelected ? 'text-white' : 'text-emerald-600'}`} />
                           <p className="font-semibold text-base mb-1">{opt.label}</p>
                           <p className={`text-sm ${isSelected ? 'text-white/80' : 'text-gray-500'}`}>{opt.desc}</p>
-                        </motion.button>
+                        </button>
                       );
                     })}
                   </div>
